@@ -83,7 +83,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
  
     fExpFile = TFile::Open("../../../hists2012.root"); 
 
-    std::string hist_name = "ProtonCal" + std::to_string(fRunNum);
+    std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
     fExpHist = (TH1F*)(fExpFile->Get(hist_name.c_str())->Clone());
     fExpHist->SetNameTitle(hist_name.c_str(),title.c_str());
@@ -126,6 +126,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     
     if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
     else fSimSortMax = fSimTree->GetEntries();
+    //fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
     std::cout << fCutoffHigh << ") " << " ; #evts ratio = " << double(fSimSortMax)/double(fExpHist->GetEntries()) << std::endl;
@@ -137,10 +138,10 @@ NeutronFit_BC537::~NeutronFit_BC537() {}
 
 void NeutronFit_BC537::SetParameters(double * par)
 {
-    fProtonCoeff[0] = par[0];
-    fProtonCoeff[1] = par[1];
-    fProtonCoeff[2] = par[2];
-    fProtonCoeff[3] = par[3];
+    fDeuteronCoeff[0] = par[0];
+    fDeuteronCoeff[1] = par[1];
+    fDeuteronCoeff[2] = par[2];
+    fDeuteronCoeff[3] = par[3];
     fCarbonCoeff[0] = par[4];
  
     fParameters[0] = par[0];
