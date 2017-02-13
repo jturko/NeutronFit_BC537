@@ -14,8 +14,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fEdepVector(NULL),
     fEkinVector(NULL),
     fPtypeVector(NULL),
-    fRebin(false),
-    fDrawStyle(false)
+    fRebin(false)
 {
     
     double energy_vector[] = 
@@ -81,7 +80,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     };
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
-    fExpFile = TFile::Open("../../../hists2012.root"); 
+    fExpFile = TFile::Open("../../../../hists2012.root"); 
 
     std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
@@ -94,7 +93,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     ApplyCutoffLow(fCutoffLow,"exp");
     fExpBinNum = fExpHist->GetNbinsX();
     
-    std::string name = "../G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
+    std::string name = "../../G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());     
 
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
@@ -118,6 +117,9 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.0;
+    fParameters[5] = 0.12;
+    fParameters[6] = 0.19;
+    fParameters[7] = 0.007;
     SetParameters(fParameters);
    
     fOffset = 8.5;
@@ -126,12 +128,13 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     
     if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
     else fSimSortMax = fSimTree->GetEntries();
-    //fSimSortMax = fSimTree->GetEntries();
+    fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
     std::cout << fCutoffHigh << ") " << " ; #evts ratio = " << double(fSimSortMax)/double(fExpHist->GetEntries()) << std::endl;
     
     fExpHist->Rebin(5);
+    //fExpHist->Rebin(10);
 
     //if(fExpBinNum == 50100) fExpHist->Rebin(10);
 }
@@ -145,23 +148,32 @@ void NeutronFit_BC537::SetParameters(double * par)
     fDeuteronCoeff[2] = par[2];
     fDeuteronCoeff[3] = par[3];
     fCarbonCoeff[0] = par[4];
+    fSmearingCoeff[0] = par[5];
+    fSmearingCoeff[1] = par[6];
+    fSmearingCoeff[2] = par[7];
  
     fParameters[0] = par[0];
     fParameters[1] = par[1];
     fParameters[2] = par[2];
     fParameters[3] = par[3];
     fParameters[4] = par[4];
+    fParameters[5] = par[5];
+    fParameters[6] = par[6];
+    fParameters[7] = par[7];
 }
 
-void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon)
+void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C)
 {
-    double par[5];
+    double par[8];
     par[0] = a1;
     par[1] = a2;
     par[2] = a3;
     par[3] = a4;
     par[4] = carbon;
-    
+    par[5] = A;    
+    par[6] = B;    
+    par[7] = C;    
+
     Sort(par);
 }
 
@@ -185,7 +197,7 @@ void NeutronFit_BC537::Sort(double * par)
     for(int i=0; i<fSimSortMax; i++)
     {
         counter++;
-        if( counter%50000==0 ) std::cout << "sorting " << fEnergy << " MeV... " << "evt " << counter << "/" << fSimSortMax << "; " << double(counter)/double(fSimSortMax)*100 << "% complete \r"  << std::flush; 
+        //if( counter%50000==0 ) std::cout << "sorting " << fEnergy << " MeV... " << "evt " << counter << "/" << fSimSortMax << "; " << double(counter)/double(fSimSortMax)*100 << "% complete \r"  << std::flush; 
      
         fEdepBranch->GetEntry(i);   
         fEkinBranch->GetEntry(i);   
@@ -241,7 +253,8 @@ void NeutronFit_BC537::Sort(double * par)
     ApplyCutoffLow(fCutoffLow,"sim");    
     fSimHist->Scale(fExpHist->Integral(fExpHist->FindBin(fCutoffLow),fExpHist->FindBin(fCutoffHigh),"width")/fSimHist->Integral(fSimHist->FindBin(fCutoffLow),fSimHist->FindBin(fCutoffHigh),"width"));
     fSimHist->SetStats(false);
-    std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
+    
+    //std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
 
     std::string title = std::to_string(fEnergy) + " MeV ; Chi2 = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());

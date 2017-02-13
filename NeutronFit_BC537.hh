@@ -48,7 +48,7 @@ public:
     }
 
     void Sort(double * par);
-    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0);
+    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.12, double B=0.19, double C=0.007);
 
     void SetSmearingCoeff(double A=0.123, double B=0.125, double C=0.0074) {
         fSmearingCoeff[0] = A;
@@ -153,7 +153,7 @@ public:
     double fBeCoeff[4];
     double fBCoeff[4];
     double fSmearingCoeff[3];
-    double fParameters[5];
+    double fParameters[8];
 
     int fSimSortMax;
     int fNumEntries;
@@ -165,7 +165,6 @@ public:
     int fExpBinNum;
     
     bool fRebin;
-    bool fDrawStyle;
     
 
 };

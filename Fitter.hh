@@ -22,7 +22,7 @@ public:
     Fitter(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 
     void Draw();
-    void Run(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0);
+    void Run(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.12, double B=0.19, double C=0.007);
 
     bool Check(int i) { if(i<=-1||i>=GetNumberOfNeutronFit_BC537s()) return false; else return true; }
     
@@ -57,16 +57,19 @@ public:
     
     void Print() { for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) std::cout << "Run# = " << fRunNumVector.at(num) << " ; Energy = " << fNeutronFit_BC537Vector.at(num).GetEnergy() << std::endl; } 
 
-    void SetParameters(double a1, double a2, double a3, double a4, double carbon) {
+    void SetParameters(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) {
         fParameters[0]=a1;
         fParameters[1]=a2;
         fParameters[2]=a3;
         fParameters[3]=a4;
         fParameters[4]=carbon;
+        fParameters[5]=A;
+        fParameters[6]=B;
+        fParameters[7]=C;
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetParameters(fParameters);
     }
     void SetParameters(double * par) { // expects a par array w/ 5 elements
-        for(int i=0; i<5; i++) fParameters[i] = par[i];
+        for(int i=0; i<8; i++) fParameters[i] = par[i];
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetParameters(fParameters);
     }
     void SetOffset(double offset) {
@@ -101,7 +104,7 @@ public:
     std::vector<NeutronFit_BC537> fNeutronFit_BC537Vector;   
     std::vector<int> fRunNumVector;
 
-    double fParameters[5];   
+    double fParameters[8];   
  
     TCanvas * fCanvas;
     
@@ -128,7 +131,26 @@ public:
         SortAllRuns();
         return DoChi2();
     }
-    
+
+    double FitValue(const double * par) {
+        double mypar[8];
+        for(int i=0; i<8; i++) mypar[i]=par[i];
+        SetParameters(mypar);
+        //if(DidParametersChange(mypar)) SortAllRuns();
+        SortAllRuns();
+        
+        double val = DoChi2();
+
+        return val;
+    }
+    bool DidParametersChange(double * par) {
+        for(int i=0; i<8; i++) {
+            if(TMath::Abs(fParameters[i] - par[i] > 0.00001)) return true;
+        }
+        return false;
+    }    
+    int MinimizeGSL(std::string name="kVectorBFGS");
+    int MinimizeSimAn();
 
     void DrawToFile(std::string name);
 

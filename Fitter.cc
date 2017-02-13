@@ -8,6 +8,9 @@ void Fitter::InitializeParameters()
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.;
+    fParameters[5] = 0.12;
+    fParameters[6] = 0.19;
+    fParameters[7] = 0.007;
 
     fSum = 0;
     fSum2 = 0;
@@ -114,9 +117,9 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
     InitializeParameters();
 }
 
-void Fitter::Run(double a1, double a2, double a3, double a4, double carbon) 
+void Fitter::Run(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) 
 {
-    SetParameters(a1,a2,a3,a4,carbon);
+    SetParameters(a1,a2,a3,a4,carbon,A,B,C);
     PrintParameters();
     if(!fCanvas) {
         fCanvas = new TCanvas();
@@ -328,4 +331,96 @@ vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon
     vec v(a1,a2,a3,a4,carbon);
     return NelderMead(v,itermax);
 }
+
+
+int Fitter::MinimizeGSL(std::string name)
+{
+    SortAllRuns();
+
+    if(name=="kVectorBFGS")             ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS );
+    else if(name == "kConjugateFR")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugateFR );  
+    else if(name == "kConjugatePR")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugatePR );  
+    else if(name == "kVectorBFGS2")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS2 );  
+    else if(name == "kSteepestDescent") ROOT::Math::GSLMinimizer mini( ROOT::Math::kSteepestDescent );  
+    else {                              ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS ); std::cout << "using kVectorBFGS minimizer" << std::endl; }
+
+    //ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS );
+    ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugatePR );
+
+    mini.SetMaxFunctionCalls(1000);
+    mini.SetMaxIterations(100);
+    mini.SetTolerance(0.0001);
+    
+    //ROOT::Math::Functor f((&Func)(&nm_val),5);
+    ROOT::Math::Functor f(this,&Fitter::FitValue,8);
+    double step[8] = { 0.1,0.2,0.1,0.1 ,0.01,0.1,0.1,0.005 };
+    double variable[8] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.12, 0.19, 0.007 };
+    
+    mini.SetFunction(f);
+    mini.SetVariable(0,"a1",variable[0],step[0]);
+    mini.SetVariable(1,"a2",variable[1],step[1]);
+    mini.SetVariable(2,"a3",variable[2],step[2]);
+    mini.SetVariable(3,"a4",variable[3],step[3]);
+    mini.SetVariable(4,"carbon",variable[4],step[4]);
+    mini.SetVariable(5,"A",variable[5],step[5]);
+    mini.SetVariable(6,"B",variable[6],step[6]);
+    mini.SetVariable(7,"C",variable[7],step[7]);
+
+    mini.Minimize();
+
+    return 0;
+        
+}
+
+int Fitter::MinimizeSimAn()
+{
+    SortAllRuns();
+
+    ROOT::Math::GSLSimAnMinimizer mini;
+
+    mini.SetMaxFunctionCalls(1000);
+    mini.SetMaxIterations(100);
+    mini.SetTolerance(0.0001);
+
+    ROOT::Math::Functor f(this,&Fitter::FitValue,8);
+    double step[8] = { 0.1,0.2,0.1,0.1 ,0.01,0.1,0.1,0.005 };
+    double variable[8] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.12, 0.19, 0.007 };
+
+    mini.SetFunction(f);
+    
+    mini.SetVariable(0,"a1",variable[0],step[0]);
+    mini.SetVariableLimits(0,0.5,1);
+    
+    mini.SetVariable(1,"a2",variable[1],step[1]);
+    mini.SetVariableLimits(1,1,10);
+    
+    mini.SetVariable(2,"a3",variable[2],step[2]);
+    mini.SetVariableLimits(2,0.1,0.5);
+    
+    mini.SetVariable(3,"a4",variable[3],step[3]);
+    mini.SetVariableLimits(3,0.8,1.2);
+    
+    mini.SetVariable(4,"carbon",variable[4],step[4]);
+    mini.SetVariableLimits(4,0,0.2);
+    
+    mini.SetVariable(5,"A",variable[5],step[5]);
+    mini.SetVariableLimits(5,0,0.3);
+    
+    mini.SetVariable(6,"B",variable[6],step[6]);
+    mini.SetVariableLimits(6,0,0.3);
+    
+    mini.SetVariable(7,"C",variable[7],step[7]);
+    mini.SetVariableLimits(7,0,0.01);
+
+    mini.SetPrintLevel(2);
+    mini.Minimize();
+
+    const double *xs = mini.X();
+    std::cout << "Best fit: Chi2(" << xs[0] << "," << xs[1] << "," << xs[2] << "," << xs[3] << "," << xs[4] << "," << xs[5] << "," << xs[6] << "," << xs[7] << ")" << std::endl;
+    
+    //std::cout << FitValue(xs);
+    return 0;
+
+}
+
 
