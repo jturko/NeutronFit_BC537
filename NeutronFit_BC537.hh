@@ -48,7 +48,7 @@ public:
     }
 
     void Sort(double * par);
-    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.12, double B=0.19, double C=0.007);
+    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0);
 
     void SetSmearingCoeff(double A=0.123, double B=0.125, double C=0.0074) {
         fSmearingCoeff[0] = A;
@@ -109,8 +109,9 @@ public:
         fExpHist->GetYaxis()->SetRangeUser(0.1,ymax);
 
         fExpHist->Draw();
+        //fFitFunc->Draw("same");
         fSimHist->Draw("same");   
-        fExpHist->Draw("same");   
+        //fExpHist->Draw("same");   
     }
 
     double GetEnergy() { return fEnergy; }
@@ -125,6 +126,14 @@ public:
     TH1F * GetExpHist() { return fExpHist; }
     
     double GetSimEntries() { return fNumEntries; }
+
+    double HistCompare(double * x, double * par);
+    TF1 * Fit();
+    bool DidParametersChange(double * par);
+
+    TF1 * GetFitFunc() { return fFitFunc; }
+
+    TF1 * fFitFunc;
 
     double fEnergy;
     int fRunNum;
@@ -153,7 +162,7 @@ public:
     double fBeCoeff[4];
     double fBCoeff[4];
     double fSmearingCoeff[3];
-    double fParameters[8];
+    double fParameters[5];
 
     int fSimSortMax;
     int fNumEntries;
@@ -163,7 +172,9 @@ public:
 
     double fChi2;
     int fExpBinNum;
-    
+    double fExpBinHigh;
+    double fExpBinLow;
+   
     bool fRebin;
     
 

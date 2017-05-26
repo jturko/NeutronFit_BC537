@@ -8,9 +8,8 @@ void Fitter::InitializeParameters()
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.;
-    fParameters[5] = 0.12;
-    fParameters[6] = 0.19;
-    fParameters[7] = 0.007;
+    
+    fMinimizeCounter = 0;
 
     fSum = 0;
     fSum2 = 0;
@@ -117,9 +116,9 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
     InitializeParameters();
 }
 
-void Fitter::Run(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) 
+void Fitter::Run(double a1, double a2, double a3, double a4, double carbon) 
 {
-    SetParameters(a1,a2,a3,a4,carbon,A,B,C);
+    SetParameters(a1,a2,a3,a4,carbon);
     PrintParameters();
     if(!fCanvas) {
         fCanvas = new TCanvas();
@@ -175,11 +174,11 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
     std::cout << "starting Nelder Mead method... " << std::endl;
     
-    double inc0 = 0.1;   // a1
-    double inc1 = 0.1;  // a2
-    double inc2 = 0.05; // a3
-    double inc3 = 0.05;  // a4
-    double inc4 = 0.01;  // carbon
+    double inc0 = 0.01;   // a1
+    double inc1 = 0.01;  // a2
+    double inc2 = 0.01; // a3
+    double inc3 = 0.01;  // a4
+    double inc4 = 0.0001;  // carbon
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
@@ -332,7 +331,6 @@ vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon
     return NelderMead(v,itermax);
 }
 
-
 int Fitter::MinimizeGSL(std::string name)
 {
     SortAllRuns();
@@ -352,9 +350,9 @@ int Fitter::MinimizeGSL(std::string name)
     mini.SetTolerance(0.0001);
     
     //ROOT::Math::Functor f((&Func)(&nm_val),5);
-    ROOT::Math::Functor f(this,&Fitter::FitValue,8);
-    double step[8] = { 0.1,0.2,0.1,0.1 ,0.01,0.1,0.1,0.005 };
-    double variable[8] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.12, 0.19, 0.007 };
+    ROOT::Math::Functor f(this,&Fitter::FitValue,5);
+    double step[5] = { 0.1,0.2,0.1,0.1 ,0.01 };
+    double variable[5] = { 0.639, 1.462, 0.373, 0.968, 0 };
     
     mini.SetFunction(f);
     mini.SetVariable(0,"a1",variable[0],step[0]);
@@ -362,9 +360,6 @@ int Fitter::MinimizeGSL(std::string name)
     mini.SetVariable(2,"a3",variable[2],step[2]);
     mini.SetVariable(3,"a4",variable[3],step[3]);
     mini.SetVariable(4,"carbon",variable[4],step[4]);
-    mini.SetVariable(5,"A",variable[5],step[5]);
-    mini.SetVariable(6,"B",variable[6],step[6]);
-    mini.SetVariable(7,"C",variable[7],step[7]);
 
     mini.Minimize();
 
@@ -382,9 +377,9 @@ int Fitter::MinimizeSimAn()
     mini.SetMaxIterations(100);
     mini.SetTolerance(0.0001);
 
-    ROOT::Math::Functor f(this,&Fitter::FitValue,8);
-    double step[8] = { 0.1,0.2,0.1,0.1 ,0.01,0.1,0.1,0.005 };
-    double variable[8] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.12, 0.19, 0.007 };
+    ROOT::Math::Functor f(this,&Fitter::FitValue,5);
+    double step[5] = { 0.1,0.2,0.1,0.1 ,0.01 };
+    double variable[5] = { 0.639, 1.462, 0.373, 0.968, 0 };
 
     mini.SetFunction(f);
     
@@ -402,25 +397,16 @@ int Fitter::MinimizeSimAn()
     
     mini.SetVariable(4,"carbon",variable[4],step[4]);
     mini.SetVariableLimits(4,0,0.2);
-    
-    mini.SetVariable(5,"A",variable[5],step[5]);
-    mini.SetVariableLimits(5,0,0.3);
-    
-    mini.SetVariable(6,"B",variable[6],step[6]);
-    mini.SetVariableLimits(6,0,0.3);
-    
-    mini.SetVariable(7,"C",variable[7],step[7]);
-    mini.SetVariableLimits(7,0,0.01);
 
-    mini.SetPrintLevel(2);
+    mini.SetPrintLevel(4);
     mini.Minimize();
 
     const double *xs = mini.X();
-    std::cout << "Best fit: Chi2(" << xs[0] << "," << xs[1] << "," << xs[2] << "," << xs[3] << "," << xs[4] << "," << xs[5] << "," << xs[6] << "," << xs[7] << ")" << std::endl;
-    
+    std::cout << "Best fit: Chi2(" << xs[0] << "," << xs[1] << "," << xs[2] << "," << xs[3] << "," << xs[4] << ")" << std::endl;
     //std::cout << FitValue(xs);
     return 0;
 
 }
+
 
 

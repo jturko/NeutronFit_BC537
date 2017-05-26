@@ -14,6 +14,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fEdepVector(NULL),
     fEkinVector(NULL),
     fPtypeVector(NULL),
+    fFitFunc(NULL),
     fRebin(false)
 {
     
@@ -45,11 +46,11 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     double cutoff_low_vector[] =
     {
         57      ,57     ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,
-        72.5    ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,
-        72.5    ,72.5   ,72.5   ,72.5   ,72.5   ,17     ,17     ,20     ,10     ,
-        10      ,15     ,15     ,15     ,15     ,15     ,15     ,15     ,10     ,
-        10      ,10     ,10     ,10     ,10     ,10     ,10     ,10     ,10     ,     
-        10      ,10     ,10     ,10     ,10     ,10     ,10     ,500    ,500    ,  
+        72.5    ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,72.5   ,200    ,
+        200     ,200    ,100    ,100    ,100    ,17     ,17     ,20     ,8.5    ,
+        8.5     ,15     ,15     ,15     ,15     ,15     ,15     ,15     ,8.5    ,
+        8.5     ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,
+        8.5     ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,8.5    ,500    ,500    ,  
         200     ,200    ,200    ,200    ,200    ,200    ,200    ,150    ,150    ,
         150 
     };
@@ -80,7 +81,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     };
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
-    fExpFile = TFile::Open("../../../../hists2012.root"); 
+    fExpFile = TFile::Open("~/data/hists2012_resort.root"); 
 
     std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
@@ -92,8 +93,10 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fExpHist->SetStats(false);
     ApplyCutoffLow(fCutoffLow,"exp");
     fExpBinNum = fExpHist->GetNbinsX();
+    fExpBinHigh = fExpHist->GetBinLowEdge(fExpBinNum+1);
+    fExpBinLow = fExpHist->GetBinLowEdge(1);
     
-    std::string name = "../../G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
+    std::string name = "~/data/smearing/deuteron/G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());     
 
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
@@ -117,26 +120,24 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.0;
-    fParameters[5] = 0.12;
-    fParameters[6] = 0.19;
-    fParameters[7] = 0.007;
     SetParameters(fParameters);
    
     fOffset = 8.5;
 
     //fSimSortMax = 200000;
     
-    if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
+    //if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
+    //else fSimSortMax = fSimTree->GetEntries();
+    
+    if(fSimTree->GetEntries() >= 5e5) fSimSortMax = 5e5;
     else fSimSortMax = fSimTree->GetEntries();
-    fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
     std::cout << fCutoffHigh << ") " << " ; #evts ratio = " << double(fSimSortMax)/double(fExpHist->GetEntries()) << std::endl;
-    
-    fExpHist->Rebin(5);
-    //fExpHist->Rebin(10);
 
+    //fExpHist->Rebin(5);
     //if(fExpBinNum == 50100) fExpHist->Rebin(10);
+
 }
 
 NeutronFit_BC537::~NeutronFit_BC537() {}
@@ -148,32 +149,23 @@ void NeutronFit_BC537::SetParameters(double * par)
     fDeuteronCoeff[2] = par[2];
     fDeuteronCoeff[3] = par[3];
     fCarbonCoeff[0] = par[4];
-    fSmearingCoeff[0] = par[5];
-    fSmearingCoeff[1] = par[6];
-    fSmearingCoeff[2] = par[7];
  
     fParameters[0] = par[0];
     fParameters[1] = par[1];
     fParameters[2] = par[2];
     fParameters[3] = par[3];
     fParameters[4] = par[4];
-    fParameters[5] = par[5];
-    fParameters[6] = par[6];
-    fParameters[7] = par[7];
 }
 
-void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C)
+void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon)
 {
-    double par[8];
+    double par[5];
     par[0] = a1;
     par[1] = a2;
     par[2] = a3;
     par[3] = a4;
     par[4] = carbon;
-    par[5] = A;    
-    par[6] = B;    
-    par[7] = C;    
-
+    
     Sort(par);
 }
 
@@ -183,10 +175,12 @@ void NeutronFit_BC537::Sort(double * par)
     gErrorIgnoreLevel = kError;    
     
     SetParameters(par);
-
+    //PrintParameters();
+    
     fExpBinNum = fExpHist->GetNbinsX();
     if(fSimHist) { delete fSimHist; fSimHist = NULL; }
-    fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,-10,5000); 
+    //fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,-10,5000); 
+    fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,fExpBinLow,fExpBinHigh); 
     int nHits = 0;
     double light = 0.;
     double centroidEkin = 0.;    
@@ -250,14 +244,56 @@ void NeutronFit_BC537::Sort(double * par)
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
 
+    fExpHist->SetBinContent(fExpBinNum+1,0);
+
     ApplyCutoffLow(fCutoffLow,"sim");    
     fSimHist->Scale(fExpHist->Integral(fExpHist->FindBin(fCutoffLow),fExpHist->FindBin(fCutoffHigh),"width")/fSimHist->Integral(fSimHist->FindBin(fCutoffLow),fSimHist->FindBin(fCutoffHigh),"width"));
     fSimHist->SetStats(false);
-    
     //std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
 
     std::string title = std::to_string(fEnergy) + " MeV ; Chi2 = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());
+    
+    if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
+    fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,5);
+    fFitFunc->SetNpx(100);
+    fFitFunc->SetParameters(fParameters[0],fParameters[1],fParameters[2],fParameters[3],fParameters[4]);
+    fFitFunc->SetParLimits(0,0.2,1);
+    fFitFunc->SetParLimits(1,0.5,10);
+    fFitFunc->SetParLimits(2,0.05,0.4);
+    fFitFunc->SetParLimits(3,0.8,1.2);
+    fFitFunc->SetParLimits(4,0,0.1);
 
 }
+
+double NeutronFit_BC537::HistCompare(double * x, double * par) 
+{
+    if(!fSimHist) Sort();
+    if(DidParametersChange(par)) Sort(par);
+    double xx = x[0];
+    int bin = fSimHist->GetXaxis()->FindBin(xx);
+    double content = fSimHist->GetBinContent(bin);
+    return content;
+
+}
+
+TF1 * NeutronFit_BC537::Fit()
+{
+    //ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2","Combination");
+    ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit","Simplex");
+    TVirtualFitter::SetPrecision(1.0e-10);
+    TVirtualFitter::SetMaxIterations(10000);
+    TFitResultPtr res = fExpHist->Fit("fFitFunc","RSV");
+    return fFitFunc;
+}
+
+bool NeutronFit_BC537::DidParametersChange(double * par)
+{
+    for(int i=0; i<5; i++) 
+    {
+        if(TMath::Abs(par[i] - fParameters[i]) > 1e-4) return true;
+    }
+    return false;
+}
+
 
