@@ -56,10 +56,8 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
         9   ,
 
         3    ,
-
-        500    ,500    ,  
-        200     ,200    ,200    ,200    ,200    ,200    ,200    ,150    ,150    ,
-        150 
+        
+        150,120,100,80,70,80,60,60,55,50,50,50
     };
     fCutoffLow = cutoff_low_vector[fRunNum];
     
@@ -90,9 +88,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
         
         22      ,
 
-        4150    ,4000  ,
-        3650    ,3200   ,2800,2500,2050    ,1750   ,1400    ,1100    ,900   ,
-        750        
+        3100,3000,2680,2500,2170,1850,1560,1250,1050,825,650,575
     };
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
@@ -144,7 +140,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     //if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
     //else fSimSortMax = fSimTree->GetEntries();
     
-    if(fSimTree->GetEntries() >= 2e5) fSimSortMax = 2e5;
+    if(fSimTree->GetEntries() >= 1e5) fSimSortMax = 1e5;
     else fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
