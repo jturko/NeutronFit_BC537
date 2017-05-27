@@ -8,6 +8,9 @@ void Fitter::InitializeParameters()
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.;
+    fParameters[5] = 0.123;
+    fParameters[6] = 0.125;
+    fParameters[7] = 0.0074;
     
     fMinimizeCounter = 0;
 
@@ -116,9 +119,9 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
     InitializeParameters();
 }
 
-void Fitter::Run(double a1, double a2, double a3, double a4, double carbon) 
+void Fitter::Run(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) 
 {
-    SetParameters(a1,a2,a3,a4,carbon);
+    SetParameters(a1,a2,a3,a4,carbon,A,B,C);
     PrintParameters();
     if(!fCanvas) {
         fCanvas = new TCanvas();
@@ -179,6 +182,9 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     double inc2 = 0.01; // a3
     double inc3 = 0.01;  // a4
     double inc4 = 0.0001;  // carbon
+    double inc5 = 0.05; // A
+    double inc6 = 0.02; // B
+    double inc7 = 0.0005; // C
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
@@ -186,6 +192,9 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     vec v3(initial_vec); v3.set(2,v1.at(2)+inc2);
     vec v4(initial_vec); v4.set(3,v1.at(3)+inc3);
     vec v5(initial_vec); v5.set(4,v1.at(4)+inc4);
+    vec v6(initial_vec); v6.set(5,v1.at(5)+inc5);
+    vec v7(initial_vec); v7.set(6,v1.at(6)+inc6);
+    vec v8(initial_vec); v8.set(7,v1.at(7)+inc7);
 
     std::vector<vec> nmvec;
     nmvec.push_back(v0);
@@ -194,6 +203,9 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     nmvec.push_back(v3);
     nmvec.push_back(v4);
     nmvec.push_back(v5);
+    nmvec.push_back(v6);
+    nmvec.push_back(v7);
+    nmvec.push_back(v8);
 
     std::cout << "calculating chi2's for the initial simplex..." << std::endl;
     std::vector<double> chi2vec;
@@ -203,21 +215,25 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         SortAllRuns();
         chi2vec.push_back(DoChi2());
     } 
+    
+    int nmvec_size = int(nmvec.size());
         
     std::cout << "starting the Nelder-Mead iterations..." << std::endl;
     //////////////////////////////////////////////////////////////////
     for(int iter=1; iter<=itermax; iter++) {
 
+        
         std::vector<vec> temp_par;
         std::vector<double> temp_chi2;
-        temp_par.resize(6);
-        temp_chi2.resize(6);
+        temp_par.resize(nmvec_size);
+        temp_chi2.resize(nmvec_size);
+
 
         // reordering...
         double test = 1e100;
         int val = 0;
-        for(int i=0; i<6; i++) {
-            for(int j=0; j<6; j++) {
+        for(int i=0; i<nmvec_size; i++) {
+            for(int j=0; j<nmvec_size; j++) {
                 if(chi2vec.at(j) < test) {
                     test = chi2vec.at(j);
                     temp_chi2.at(i) = test;
@@ -232,17 +248,17 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         chi2vec = temp_chi2;
         
         std::cout << "printing the reordered variables..." << std::endl;
-        for(int i=0; i<6; i++) {
+        for(int i=0; i<nmvec_size; i++) {
             std::cout << " chi2 = " << chi2vec.at(i);
             std::cout << " pars = ";
-            for(int j=0; j<4; j++) std::cout << nmvec.at(i).at(j) << " , "; std::cout << nmvec.at(i).at(4);
+            for(int j=0; j<nmvec_size-2; j++) std::cout << nmvec.at(i).at(j) << " , "; std::cout << nmvec.at(i).at(nmvec_size-2);
             std::cout << std::endl;
         }
         
     
         vec B(nmvec.at(0)); double B_chi2 = chi2vec.at(0);
         vec G(nmvec.at(1)); double G_chi2 = chi2vec.at(1);
-        vec W(nmvec.at(5)); double W_chi2 = chi2vec.at(5);
+        vec W(nmvec.at(nmvec_size-1)); double W_chi2 = chi2vec.at(nmvec_size-1);
         vec M = B.midpoint(G); double M_chi2 = nm_val(M);
         vec R = M.scalar_multiply(2.); R.subtract(W); double R_chi2 = nm_val(R);
         vec E = R.scalar_multiply(2.); E.subtract(M); double E_chi2 = 0;
@@ -284,7 +300,7 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         }
         nmvec.at(0) = B; chi2vec.at(0) = B_chi2;
         nmvec.at(1) = G; chi2vec.at(1) = G_chi2;
-        nmvec.at(5) = W; chi2vec.at(5) = W_chi2;
+        nmvec.at(nmvec_size-1) = W; chi2vec.at(nmvec_size-1) = W_chi2;
     
         std::cout << std::endl << "finished iteration # " << iter << "/" << itermax << std::endl << std::endl;
         
@@ -293,12 +309,12 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
 
     std::vector<vec> temp_par;
     std::vector<double> temp_chi2;
-    temp_par.resize(6);
-    temp_chi2.resize(6);
+    temp_par.resize(nmvec_size);
+    temp_chi2.resize(nmvec_size);
     double test = 1e100;
     int val = 0;
-    for(int i=0; i<6; i++) {
-        for(int j=0; j<6; j++) {
+    for(int i=0; i<nmvec_size; i++) {
+        for(int j=0; j<nmvec_size; j++) {
             if(chi2vec.at(j) < test) {
                 test = chi2vec.at(j);
                 temp_chi2.at(i) = test;
@@ -312,22 +328,22 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     nmvec = temp_par;
     chi2vec = temp_chi2;
     std::cout << "printing the reordered variables..." << std::endl;
-    for(int i=0; i<6; i++) {
+    for(int i=0; i<nmvec_size; i++) {
         std::cout << " chi2 = " << chi2vec.at(i);
         std::cout << " pars = ";
-        for(int j=0; j<4; j++) std::cout << nmvec.at(i).at(j) << " , "; std::cout << nmvec.at(i).at(4);
+        for(int j=0; j<nmvec_size-2; j++) std::cout << nmvec.at(i).at(j) << " , "; std::cout << nmvec.at(i).at(nmvec_size-2);
         std::cout << std::endl;
     }
      
-    Run(nmvec.at(0).at(0), nmvec.at(0).at(1), nmvec.at(0).at(2), nmvec.at(0).at(3), nmvec.at(0).at(4));
+    Run(nmvec.at(0).at(0), nmvec.at(0).at(1), nmvec.at(0).at(2), nmvec.at(0).at(3), nmvec.at(0).at(4), nmvec.at(0).at(5), nmvec.at(0).at(6), nmvec.at(0).at(7));
     return nmvec.at(0);
 
    //////////////////////////////////////////////////////////////////
 }
 
-vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon, int itermax) 
+vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C, int itermax) 
 {
-    vec v(a1,a2,a3,a4,carbon);
+    vec v(a1,a2,a3,a4,carbon,A,B,C);
     return NelderMead(v,itermax);
 }
 
@@ -349,10 +365,12 @@ int Fitter::MinimizeGSL(std::string name)
     mini.SetMaxIterations(100);
     mini.SetTolerance(0.0001);
     
+    const int nPar = 8;
+
     //ROOT::Math::Functor f((&Func)(&nm_val),5);
-    ROOT::Math::Functor f(this,&Fitter::FitValue,5);
-    double step[5] = { 0.1,0.2,0.1,0.1 ,0.01 };
-    double variable[5] = { 0.639, 1.462, 0.373, 0.968, 0 };
+    ROOT::Math::Functor f(this,&Fitter::FitValue,nPar);
+    double step[nPar] = { 0.1,0.2,0.1,0.1 ,0.01, 0.05, 0.02, 0.0005 };
+    double variable[nPar] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.123,0.125,0.0075};
     
     mini.SetFunction(f);
     mini.SetVariable(0,"a1",variable[0],step[0]);
@@ -360,6 +378,9 @@ int Fitter::MinimizeGSL(std::string name)
     mini.SetVariable(2,"a3",variable[2],step[2]);
     mini.SetVariable(3,"a4",variable[3],step[3]);
     mini.SetVariable(4,"carbon",variable[4],step[4]);
+    mini.SetVariable(5,"A",variable[5],step[5]);
+    mini.SetVariable(6,"B",variable[6],step[6]);
+    mini.SetVariable(7,"C",variable[7],step[7]);
 
     mini.Minimize();
 
@@ -377,9 +398,11 @@ int Fitter::MinimizeSimAn()
     mini.SetMaxIterations(100);
     mini.SetTolerance(0.0001);
 
-    ROOT::Math::Functor f(this,&Fitter::FitValue,5);
-    double step[5] = { 0.1,0.2,0.1,0.1 ,0.01 };
-    double variable[5] = { 0.639, 1.462, 0.373, 0.968, 0 };
+    const int nPar = 8;
+
+    ROOT::Math::Functor f(this,&Fitter::FitValue,nPar);
+    double step[nPar] = { 0.1,0.2,0.1,0.1 ,0.01, 0.05, 0.02, 0.0005 };
+    double variable[nPar] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.123,0.125,0.0075};
 
     mini.SetFunction(f);
     
@@ -398,11 +421,20 @@ int Fitter::MinimizeSimAn()
     mini.SetVariable(4,"carbon",variable[4],step[4]);
     mini.SetVariableLimits(4,0,0.2);
 
+    mini.SetVariable(5,"A",variable[5],step[5]);
+    mini.SetVariableLimits(5,0,0.4);
+    
+    mini.SetVariable(6,"B",variable[6],step[6]);
+    mini.SetVariableLimits(6,0,0.3);
+    
+    mini.SetVariable(7,"C",variable[7],step[6]);
+    mini.SetVariableLimits(7,0,0.01);
+
     mini.SetPrintLevel(4);
     mini.Minimize();
 
     const double *xs = mini.X();
-    std::cout << "Best fit: Chi2(" << xs[0] << "," << xs[1] << "," << xs[2] << "," << xs[3] << "," << xs[4] << ")" << std::endl;
+    std::cout << "Best fit: Chi2(" << xs[0] << "," << xs[1] << "," << xs[2] << "," << xs[3] << "," << xs[4] << "," << xs[5] << "," << xs[6] << "," << xs[7] << ")" << std::endl;
     //std::cout << FitValue(xs);
     return 0;
 
