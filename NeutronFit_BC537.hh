@@ -41,14 +41,14 @@ public:
         std::cout << "     a3 = " << fParameters[2] << std::endl;
         std::cout << "     a4 = " << fParameters[3] << std::endl;
         std::cout << " carbon = " << fParameters[4] << std::endl;
-        std::cout << "      A = " << fSmearingCoeff[0] << std::endl;
-        std::cout << "      B = " << fSmearingCoeff[1] << std::endl;
-        std::cout << "      C = " << fSmearingCoeff[2] << std::endl;
+        std::cout << "      A = " << fParameters[5] << std::endl;
+        std::cout << "      B = " << fParameters[6] << std::endl;
+        std::cout << "      C = " << fParameters[7] << std::endl;
         std::cout << " offset = " << fOffset << " keVee " << std::endl;
     }
 
     void Sort(double * par);
-    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0);
+    void Sort(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.123, double B=0.125, double C=0.0074);
 
     void SetSmearingCoeff(double A=0.123, double B=0.125, double C=0.0074) {
         fSmearingCoeff[0] = A;
@@ -162,7 +162,8 @@ public:
     double fBeCoeff[4];
     double fBCoeff[4];
     double fSmearingCoeff[3];
-    double fParameters[5];
+    
+    double fParameters[8];
 
     int fSimSortMax;
     int fNumEntries;

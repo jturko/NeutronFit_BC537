@@ -101,6 +101,8 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fExpHist->SetLineColor(kBlack);
     fExpHist->GetXaxis()->UnZoom(); 
     fExpHist->GetYaxis()->UnZoom();
+    fExpHist->GetXaxis()->SetTitleOffset(0.75);
+    fExpHist->GetXaxis()->SetTitleSize(0.05);
     fExpHist->SetStats(false);
     ApplyCutoffLow(fCutoffLow,"exp");
     fExpBinNum = fExpHist->GetNbinsX();
@@ -131,6 +133,9 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.0;
+    fParameters[5] = 0.123;
+    fParameters[6] = 0.125;
+    fParameters[7] = 0.0074;
     SetParameters(fParameters);
    
     fOffset = 8.5;
@@ -140,7 +145,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     //if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
     //else fSimSortMax = fSimTree->GetEntries();
     
-    if(fSimTree->GetEntries() >= 1e5) fSimSortMax = 1e5;
+    if(fSimTree->GetEntries() >= 5e5) fSimSortMax = 5e5;
     else fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
@@ -160,23 +165,32 @@ void NeutronFit_BC537::SetParameters(double * par)
     fDeuteronCoeff[2] = par[2];
     fDeuteronCoeff[3] = par[3];
     fCarbonCoeff[0] = par[4];
- 
+    fSmearingCoeff[0] = par[5]; 
+    fSmearingCoeff[1] = par[6]; 
+    fSmearingCoeff[2] = par[7]; 
+
     fParameters[0] = par[0];
     fParameters[1] = par[1];
     fParameters[2] = par[2];
     fParameters[3] = par[3];
     fParameters[4] = par[4];
+    fParameters[5] = par[5];
+    fParameters[6] = par[6];
+    fParameters[7] = par[7];
 }
 
-void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon)
+void NeutronFit_BC537::Sort(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C)
 {
-    double par[5];
+    double par[8];
     par[0] = a1;
     par[1] = a2;
     par[2] = a3;
     par[3] = a4;
     par[4] = carbon;
-    
+    par[5] = A;    
+    par[6] = B;    
+    par[7] = C;    
+
     Sort(par);
 }
 
@@ -262,20 +276,21 @@ void NeutronFit_BC537::Sort(double * par)
     fSimHist->SetStats(false);
     //std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
 
-    fExpHist->GetXaxis()->SetTitleOffset(0.75);
-    fExpHist->GetXaxis()->SetTitleSize(0.05);
     std::string title = std::to_string(fEnergy) + " MeV ; #chi^{2} = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());
     
     if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
-    fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,5);
+    fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,8);
     fFitFunc->SetNpx(100);
-    fFitFunc->SetParameters(fParameters[0],fParameters[1],fParameters[2],fParameters[3],fParameters[4]);
+    fFitFunc->SetParameters(fParameters[0],fParameters[1],fParameters[2],fParameters[3],fParameters[4],fParameters[5],fParameters[6],fParameters[7]);
     fFitFunc->SetParLimits(0,0.2,1);
     fFitFunc->SetParLimits(1,0.5,10);
     fFitFunc->SetParLimits(2,0.05,0.4);
     fFitFunc->SetParLimits(3,0.8,1.2);
     fFitFunc->SetParLimits(4,0,0.1);
+    fFitFunc->SetParLimits(5,0,0.3);
+    fFitFunc->SetParLimits(6,0,0.3);
+    fFitFunc->SetParLimits(7,0,0.05);
 
 }
 
@@ -302,7 +317,7 @@ TF1 * NeutronFit_BC537::Fit()
 
 bool NeutronFit_BC537::DidParametersChange(double * par)
 {
-    for(int i=0; i<5; i++) 
+    for(int i=0; i<8; i++) 
     {
         if(TMath::Abs(par[i] - fParameters[i]) > 1e-4) return true;
     }
