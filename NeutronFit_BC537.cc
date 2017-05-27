@@ -262,7 +262,9 @@ void NeutronFit_BC537::Sort(double * par)
     fSimHist->SetStats(false);
     //std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
 
-    std::string title = std::to_string(fEnergy) + " MeV ; Chi2 = " + std::to_string(DoChi2());
+    fExpHist->GetXaxis()->SetTitleOffset(0.75);
+    fExpHist->GetXaxis()->SetTitleSize(0.05);
+    std::string title = std::to_string(fEnergy) + " MeV ; #chi^{2} = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());
     
     if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
