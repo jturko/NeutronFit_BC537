@@ -498,7 +498,7 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
     
 }
 
-int Fitter::MyMinimizeSimAn()
+int Fitter::MyMinimizeSimAn(double alpha = 0.9, double T_0 = 1000, double T_min = 1)
 {
     fRandom = TRandom3(0);
     
@@ -511,11 +511,13 @@ int Fitter::MyMinimizeSimAn()
     for(int i=0; i<fNPar; i++) std::cout << "x(0)_" << i << " = " << old_soln[i] << "  ";
     std::cout << std::endl;
     
+    double itermax = TMath::Log(T_min/T_0)/TMath::Log(alpha);
+    double T = T_0;
 
-    double itermax = 100;
-    double alpha = 0.9; // factor to reduce the temperature
-    double T = 1000;
-    double T_min = T*TMath::Power(alpha,itermax); // define final temperature based on number of iterations
+    //double itermax = 1000;
+    //double alpha = 0.98; // factor to reduce the temperature
+    //double T = 10000;
+    //double T_min = T*TMath::Power(alpha,itermax); // define final temperature based on number of iterations
     int iter = 1;
 
     double old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
@@ -536,7 +538,7 @@ int Fitter::MyMinimizeSimAn()
         else chance = TMath::Exp(-delta/T);
         double rando = fRandom.Rndm();
         
-        std::cout << "T = " << T << " old = " << old_chi2 << " new = " << new_chi2 << " chance = " << chance << std::endl;
+        std::cout << "Iteration " << iter << "/" << int(itermax)+1 << " T = " << T << " old = " << old_chi2 << " new = " << new_chi2 << " chance = " << chance << std::endl;
         
         if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
             for(int i=0; i<fNPar; i++) old_soln[i] = new_soln[i];
@@ -550,10 +552,11 @@ int Fitter::MyMinimizeSimAn()
         iter++;
     }
 
-    std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
-    for(int i=0; i<fNPar; i++) std::cout << best_soln[i] << " , ";
-    std::cout << std::endl;
-
+    //std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
+    //for(int i=0; i<fNPar; i++) std::cout << best_soln[i] << " , ";
+    //std::cout << std::endl;
+    
+    Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],best_soln[4],best_soln[5],best_soln[6],best_soln[7]);
 
     return 1;
 }
