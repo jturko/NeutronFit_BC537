@@ -150,7 +150,8 @@ public:
     }    
     int MinimizeGSL(std::string name="kVectorBFGS");
     int MinimizeSimAn();
-    
+    int MyMinimizeSimAn();   
+ 
 
     void DrawToFile(std::string name);
 
@@ -167,6 +168,25 @@ public:
 
     double fSum;
     double fSum2;
+
+    int fNPar;
+    TRandom3 fRandom;
+    
+    void SimAnStep(double * old_soln, double * new_soln);
+    
+    void SetSimAnHigh(int i, double val) {
+        fXhigh[i] = val;
+    }
+    void SetSimAnLow(int i, double val) {
+        fXlow[i] = val;
+    }
+    void SetSimAnStep(int i, double val) {
+        fXstep[i] = val;
+    }
+    
+    double * fXhigh;
+    double * fXlow;
+    double * fXstep;
 
 
 };

@@ -13,6 +13,42 @@ void Fitter::InitializeParameters()
     fParameters[7] = 0.0074;
     
     fMinimizeCounter = 0;
+ 
+    fNPar = 8;
+    const int nPar = (const int)fNPar; 
+    fXhigh = new double[fNPar];
+    fXlow = new double[fNPar];
+    fXstep = new double[fNPar];
+    
+    SetSimAnHigh(0,1);
+    SetSimAnHigh(1,10);
+    SetSimAnHigh(2,0.5);
+    SetSimAnHigh(3,1.2);
+    SetSimAnHigh(4,0.2);
+    SetSimAnHigh(5,0.4);
+    SetSimAnHigh(6,0.3);
+    SetSimAnHigh(7,0.01);
+    
+    SetSimAnLow(0,0.5);
+    SetSimAnLow(1,1);
+    SetSimAnLow(2,0.1);
+    SetSimAnLow(3,0.8);
+    SetSimAnLow(4,0);
+    SetSimAnLow(5,0);
+    SetSimAnLow(6,0);
+    SetSimAnLow(7,0);
+
+    SetSimAnStep(0,0.05);
+    SetSimAnStep(1,0.2);
+    SetSimAnStep(2,0.05);
+    SetSimAnStep(3,0.05);
+    SetSimAnStep(4,0.05);
+    SetSimAnStep(6,0.05);
+    SetSimAnStep(7,0.001);
+
+    //double x_high[fNPar] = { 1, 10, 0.5, 1.2, 0.2, 0.4, 0.3, 0.01};
+    //double x_low[fNPar] = { 0.5, 1, 0.1, 0.8, 0, 0, 0, 0 };
+    //double x_step[fNPar] = { 0.05, 0.2, 0.05, 0.05, 0.05, 0.05, 0.001}; 
 
     fSum = 0;
     fSum2 = 0;
@@ -441,6 +477,85 @@ int Fitter::MinimizeSimAn()
     //std::cout << FitValue(xs);
     return 0;
 
+}
+
+void Fitter::SimAnStep(double * old_soln, double * new_soln) 
+{
+    fRandom = TRandom3(0);
+    //fRandom.RndmArray(fNPar,new_soln);
+
+    for(int i=0; i<fNPar; i++) {
+        bool go = true;
+        while(go) {
+            //std::cout << "par " << i << " randomization ... " << std::endl;
+            new_soln[i] = fRandom.Rndm();
+            //std::cout << " value from [0,1] = " << new_soln[i] << std::endl;
+            new_soln[i] = (old_soln[i]-fXstep[i]) + new_soln[i]*2*fXstep[i];
+            //std::cout << " value from [" << old_soln[i]-fXstep[i] << "," << old_soln[i]+fXstep[i] << "] = " << new_soln[i] << std::endl;
+            if(new_soln[i] > fXlow[i] && new_soln[i] < fXhigh[i]) go = false;    
+        }
+    } 
+    
+}
+
+int Fitter::MyMinimizeSimAn()
+{
+    fRandom = TRandom3(0);
+    
+    const int nPar = (const int)fNPar;
+    double old_soln[nPar];
+
+    //  generate x(0) - the initial random solution
+    fRandom.RndmArray(fNPar,old_soln);
+    for(int i=0; i<fNPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+    for(int i=0; i<fNPar; i++) std::cout << "x(0)_" << i << " = " << old_soln[i] << "  ";
+    std::cout << std::endl;
+    
+
+    double itermax = 100;
+    double alpha = 0.9; // factor to reduce the temperature
+    double T = 1000;
+    double T_min = T*TMath::Power(alpha,itermax); // define final temperature based on number of iterations
+    int iter = 1;
+
+    double old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+    double new_chi2, best_chi2, delta;   
+    double new_soln[nPar];
+    double best_soln[nPar];
+    best_chi2 = 1e9;
+    while(T > T_min) {
+        SimAnStep(old_soln,new_soln);
+        new_chi2 = FitValue((const double *)new_soln);
+        if(new_chi2 < best_chi2) {
+            for(int i=0; i<fNPar; i++) best_soln[i] = new_soln[i];
+            best_chi2 = new_chi2;
+        }
+        delta = TMath::Abs(old_chi2 - new_chi2);
+        double chance;
+        if(new_chi2 < old_chi2) chance = 1;
+        else chance = TMath::Exp(-delta/T);
+        double rando = fRandom.Rndm();
+        
+        std::cout << "T = " << T << " old = " << old_chi2 << " new = " << new_chi2 << " chance = " << chance << std::endl;
+        
+        if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
+            for(int i=0; i<fNPar; i++) old_soln[i] = new_soln[i];
+            old_chi2 = new_chi2;
+        }       
+
+        //for(int i=0; i<fNPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
+        //std::cout << std::endl;
+    
+        T *= alpha;
+        iter++;
+    }
+
+    std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
+    for(int i=0; i<fNPar; i++) std::cout << best_soln[i] << " , ";
+    std::cout << std::endl;
+
+
+    return 1;
 }
 
 
