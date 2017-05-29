@@ -19,31 +19,45 @@ void Fitter::InitializeParameters()
     fXhigh = new double[fNPar];
     fXlow = new double[fNPar];
     fXstep = new double[fNPar];
-    
-    SetSimAnHigh(0,1);
-    SetSimAnHigh(1,10);
-    SetSimAnHigh(2,0.5);
-    SetSimAnHigh(3,1.2);
-    SetSimAnHigh(4,0.2);
-    SetSimAnHigh(5,0.4);
-    SetSimAnHigh(6,0.3);
-    SetSimAnHigh(7,0.01);
-    
-    SetSimAnLow(0,0.5);
-    SetSimAnLow(1,1);
-    SetSimAnLow(2,0.1);
-    SetSimAnLow(3,0.8);
-    SetSimAnLow(4,0);
-    SetSimAnLow(5,0);
-    SetSimAnLow(6,0);
-    SetSimAnLow(7,0);
 
+    // a1
+    SetSimAnHigh(0,1);
+    SetSimAnLow(0,0.6);    
     SetSimAnStep(0,0.05);
-    SetSimAnStep(1,0.2);
+
+    // a2
+    SetSimAnHigh(1,10);
+    SetSimAnLow(1,1);
+    SetSimAnStep(1,0.25);
+    
+    // a3
+    SetSimAnHigh(2,0.5);
+    SetSimAnLow(2,0.1);
     SetSimAnStep(2,0.05);
+    
+    // s4
+    SetSimAnHigh(3,1.2);
+    SetSimAnLow(3,0.8);
     SetSimAnStep(3,0.05);
-    SetSimAnStep(4,0.05);
+    
+    // 12C
+    SetSimAnHigh(4,0.01);
+    SetSimAnLow(4,0);
+    SetSimAnStep(4,0.001);
+    
+    // A
+    SetSimAnHigh(5,0.4);
+    SetSimAnLow(5,0);
+    SetSimAnStep(5,0.05);
+    
+    // B
+    SetSimAnHigh(6,0.3);
+    SetSimAnLow(6,0);
     SetSimAnStep(6,0.05);
+    
+    // C
+    SetSimAnHigh(7,0.01);
+    SetSimAnLow(7,0);
     SetSimAnStep(7,0.001);
 
     //double x_high[fNPar] = { 1, 10, 0.5, 1.2, 0.2, 0.4, 0.3, 0.01};
@@ -498,7 +512,7 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
     
 }
 
-int Fitter::MyMinimizeSimAn(double alpha = 0.9, double T_0 = 1000, double T_min = 1)
+int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min = 1)
 {
     fRandom = TRandom3(0);
     
@@ -525,26 +539,33 @@ int Fitter::MyMinimizeSimAn(double alpha = 0.9, double T_0 = 1000, double T_min 
     double new_soln[nPar];
     double best_soln[nPar];
     best_chi2 = 1e9;
+    int inloopmax = 10;
     while(T > T_min) {
-        SimAnStep(old_soln,new_soln);
-        new_chi2 = FitValue((const double *)new_soln);
-        if(new_chi2 < best_chi2) {
-            for(int i=0; i<fNPar; i++) best_soln[i] = new_soln[i];
-            best_chi2 = new_chi2;
+        for(int inloop = 0; inloop<inloopmax; inloop++) {        
+            SimAnStep(old_soln,new_soln);
+            new_chi2 = FitValue((const double *)new_soln);
+            if(new_chi2 < best_chi2) {
+                best_chi2 = new_chi2;
+                std::cout << "\t--->>> new best fit! - chi2 = " << best_chi2 << "\t (";
+                for(int i=0; i<fNPar; i++) {
+                    best_soln[i] = new_soln[i];
+                    std::cout << best_soln[i] << " , "; 
+                }
+                std::cout << "\b\b)" << std::endl;
+            }
+            delta = TMath::Abs(old_chi2 - new_chi2);
+            double chance;
+            if(new_chi2 < old_chi2) chance = 1;
+            else chance = TMath::Exp(-delta/T);
+            double rando = fRandom.Rndm();
+            
+            if(inloop==0) std::cout << "Iter " << iter << "/" << (int(itermax)+1) << "\t T = " << T << "\t old = " << old_chi2 << "\t new = " << new_chi2 << "\t chance = " << chance << std::endl;
+            
+            if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
+                for(int i=0; i<fNPar; i++) old_soln[i] = new_soln[i];
+                old_chi2 = new_chi2;
+            }       
         }
-        delta = TMath::Abs(old_chi2 - new_chi2);
-        double chance;
-        if(new_chi2 < old_chi2) chance = 1;
-        else chance = TMath::Exp(-delta/T);
-        double rando = fRandom.Rndm();
-        
-        std::cout << "Iteration " << iter << "/" << int(itermax)+1 << " T = " << T << " old = " << old_chi2 << " new = " << new_chi2 << " chance = " << chance << std::endl;
-        
-        if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
-            for(int i=0; i<fNPar; i++) old_soln[i] = new_soln[i];
-            old_chi2 = new_chi2;
-        }       
-
         //for(int i=0; i<fNPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
         //std::cout << std::endl;
     
