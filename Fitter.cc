@@ -351,19 +351,21 @@ int Fitter::MinimizeGSL(std::string name)
 {
     SortAllRuns();
 
-    if(name=="kVectorBFGS")             ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS );
-    else if(name == "kConjugateFR")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugateFR );  
-    else if(name == "kConjugatePR")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugatePR );  
-    else if(name == "kVectorBFGS2")     ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS2 );  
-    else if(name == "kSteepestDescent") ROOT::Math::GSLMinimizer mini( ROOT::Math::kSteepestDescent );  
-    else {                              ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS ); std::cout << "using kVectorBFGS minimizer" << std::endl; }
+    ROOT::Math::GSLMinimizer * mini;
+
+    if(name=="kVectorBFGS")             mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kVectorBFGS );
+    else if(name == "kConjugateFR")     mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kConjugateFR );  
+    else if(name == "kConjugatePR")     mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kConjugatePR );  
+    else if(name == "kVectorBFGS2")     mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kVectorBFGS2 );  
+    else if(name == "kSteepestDescent") mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kSteepestDescent );  
+    else {                              mini = new ROOT::Math::GSLMinimizer( ROOT::Math::kVectorBFGS ); std::cout << "using kVectorBFGS minimizer" << std::endl; }
 
     //ROOT::Math::GSLMinimizer mini( ROOT::Math::kVectorBFGS );
-    ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugatePR );
+    //ROOT::Math::GSLMinimizer mini( ROOT::Math::kConjugatePR );
 
-    mini.SetMaxFunctionCalls(1000);
-    mini.SetMaxIterations(100);
-    mini.SetTolerance(0.0001);
+    mini->SetMaxFunctionCalls(1000);
+    mini->SetMaxIterations(100);
+    mini->SetTolerance(0.0001);
     
     const int nPar = 8;
 
@@ -372,17 +374,18 @@ int Fitter::MinimizeGSL(std::string name)
     double step[nPar] = { 0.1,0.2,0.1,0.1 ,0.01, 0.05, 0.02, 0.0005 };
     double variable[nPar] = { 0.639, 1.462, 0.373, 0.968, 0 , 0.123,0.125,0.0075};
     
-    mini.SetFunction(f);
-    mini.SetVariable(0,"a1",variable[0],step[0]);
-    mini.SetVariable(1,"a2",variable[1],step[1]);
-    mini.SetVariable(2,"a3",variable[2],step[2]);
-    mini.SetVariable(3,"a4",variable[3],step[3]);
-    mini.SetVariable(4,"carbon",variable[4],step[4]);
-    mini.SetVariable(5,"A",variable[5],step[5]);
-    mini.SetVariable(6,"B",variable[6],step[6]);
-    mini.SetVariable(7,"C",variable[7],step[7]);
+    mini->SetFunction(f);
+    mini->SetVariable(0,"a1",variable[0],step[0]);
+    mini->SetVariable(1,"a2",variable[1],step[1]);
+    mini->SetVariable(2,"a3",variable[2],step[2]);
+    mini->SetVariable(3,"a4",variable[3],step[3]);
+    mini->SetVariable(4,"carbon",variable[4],step[4]);
+    mini->SetVariable(5,"A",variable[5],step[5]);
+    mini->SetVariable(6,"B",variable[6],step[6]);
+    mini->SetVariable(7,"C",variable[7],step[7]);
 
-    mini.Minimize();
+    mini->SetPrintLevel(4);
+    mini->Minimize();
 
     return 0;
         
