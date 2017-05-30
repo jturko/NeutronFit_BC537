@@ -546,7 +546,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min = 1)
             new_chi2 = FitValue((const double *)new_soln);
             if(new_chi2 < best_chi2) {
                 best_chi2 = new_chi2;
-                std::cout << "\t--->>> new best fit! - chi2 = " << best_chi2 << "\t (";
+                std::cout << "\t--->>> new best fit! - chi2 = " << best_chi2 << "\t ( ";
                 for(int i=0; i<fNPar; i++) {
                     best_soln[i] = new_soln[i];
                     std::cout << best_soln[i] << " , "; 
