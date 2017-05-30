@@ -57,7 +57,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
 
         3    ,
         
-        150,120,100,80,70,80,60,60,55,50,50,50
+        300,300,100,80,70,80,60,60,55,50,50,50
     };
     fCutoffLow = cutoff_low_vector[fRunNum];
     
