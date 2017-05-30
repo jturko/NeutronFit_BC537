@@ -22,47 +22,43 @@ void Fitter::InitializeParameters()
 
     // a1
     SetSimAnHigh(0,1);
-    SetSimAnLow(0,0.6);    
-    SetSimAnStep(0,0.05);
+    SetSimAnLow(0,0.5);    
+    SetSimAnStep(0,0.01);
 
     // a2
     SetSimAnHigh(1,10);
     SetSimAnLow(1,1);
-    SetSimAnStep(1,0.25);
+    SetSimAnStep(1,0.5);
     
     // a3
     SetSimAnHigh(2,0.5);
     SetSimAnLow(2,0.1);
-    SetSimAnStep(2,0.05);
+    SetSimAnStep(2,0.01);
     
-    // s4
+    // a4
     SetSimAnHigh(3,1.2);
     SetSimAnLow(3,0.8);
-    SetSimAnStep(3,0.05);
+    SetSimAnStep(3,0.01);
     
     // 12C
-    SetSimAnHigh(4,0.01);
-    SetSimAnLow(4,0);
-    SetSimAnStep(4,0.001);
+    SetSimAnHigh(4,0.05);
+    SetSimAnLow(4,-0.0001);
+    SetSimAnStep(4,0.0001);
     
     // A
     SetSimAnHigh(5,0.4);
     SetSimAnLow(5,0);
-    SetSimAnStep(5,0.05);
+    SetSimAnStep(5,0.025);
     
     // B
     SetSimAnHigh(6,0.3);
     SetSimAnLow(6,0);
-    SetSimAnStep(6,0.05);
+    SetSimAnStep(6,0.025);
     
     // C
     SetSimAnHigh(7,0.01);
     SetSimAnLow(7,0);
     SetSimAnStep(7,0.001);
-
-    //double x_high[fNPar] = { 1, 10, 0.5, 1.2, 0.2, 0.4, 0.3, 0.01};
-    //double x_low[fNPar] = { 0.5, 1, 0.1, 0.8, 0, 0, 0, 0 };
-    //double x_step[fNPar] = { 0.05, 0.2, 0.05, 0.05, 0.05, 0.05, 0.001}; 
 
     fSum = 0;
     fSum2 = 0;
