@@ -150,7 +150,7 @@ public:
     }    
     int MinimizeGSL(std::string name="kVectorBFGS");
     int MinimizeSimAn();
-    int MyMinimizeSimAn(double alpha = 0.95, double T_0 = 10, double T_min = 0.01);   
+    int MyMinimizeSimAn(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
  
 
     void DrawToFile(std::string name);

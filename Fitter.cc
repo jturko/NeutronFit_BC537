@@ -41,7 +41,7 @@ void Fitter::InitializeParameters()
     SetSimAnStep(3,0.01);
     
     // 12C
-    SetSimAnHigh(4,0.05);
+    SetSimAnHigh(4,0.02);
     SetSimAnLow(4,-0.0001);
     SetSimAnStep(4,0.0001);
     
