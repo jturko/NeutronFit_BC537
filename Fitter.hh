@@ -187,7 +187,14 @@ public:
     double * fXhigh;
     double * fXlow;
     double * fXstep;
-
+    
+    int fInloopmax;
+    void SetInLoopMax(int val) {
+        fInloopmax = val;   
+    }
+    int GetInLoopMax() {
+        return fInloopmax;
+    }    
 
 };
 

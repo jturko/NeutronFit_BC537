@@ -105,7 +105,7 @@ public:
         if(fSimHist) fSimHist->SetLineColor(kRed);
         else { std::cout << "no sim hist sorted yet!" << std::endl; return; }
         fExpHist->GetXaxis()->SetRangeUser(fCutoffLow-30,fCutoffHigh+150);
-        double ymax = 2*fExpHist->GetBinContent(fExpHist->GetMaximumBin());
+        double ymax = 1.25*fExpHist->GetBinContent(fExpHist->GetMaximumBin());
         fExpHist->GetYaxis()->SetRangeUser(0.1,ymax);
 
         fExpHist->Draw();

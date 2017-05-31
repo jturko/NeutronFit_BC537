@@ -60,6 +60,8 @@ void Fitter::InitializeParameters()
     SetSimAnLow(7,0);
     SetSimAnStep(7,0.001);
 
+    fInloopmax = 10;
+
     fSum = 0;
     fSum2 = 0;
 }
@@ -508,8 +510,10 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
     
 }
 
-int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min = 1)
+int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
 {
+    std::cout << std::fixed << std::setprecision(5);
+    
     fRandom = TRandom3(0);
     
     const int nPar = (const int)fNPar;
@@ -535,9 +539,8 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min = 1)
     double new_soln[nPar];
     double best_soln[nPar];
     best_chi2 = 1e9;
-    int inloopmax = 10;
     while(T > T_min) {
-        for(int inloop = 0; inloop<inloopmax; inloop++) {        
+        for(int inloop = 0; inloop<fInloopmax; inloop++) {        
             SimAnStep(old_soln,new_soln);
             new_chi2 = FitValue((const double *)new_soln);
             if(new_chi2 < best_chi2) {
