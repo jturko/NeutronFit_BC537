@@ -213,7 +213,9 @@ void NeutronFit_BC537::Sort(double * par)
     double centroidEres = 0.;    
     
     int counter = 0;
-
+clock_t overalstart = clock();
+double resolutiontime = 0.;
+double runningtime = 0.;
     for(int i=0; i<fSimSortMax; i++)
     {
         counter++;
@@ -258,17 +260,22 @@ void NeutronFit_BC537::Sort(double * par)
                 centroidEkin = 0.; 
                 centroidEres = 0.; 
             } 
-
+            clock_t resolutionstart = clock();
             if(centroidEkin>0.){
                 light += 1000.*fRandom.Gaus(centroidEkin, Resolution(centroidEkin,fSmearingCoeff));
             }
             if(centroidEres>0.){
                 light -= 1000.*fRandom.Gaus(centroidEres, Resolution(centroidEres,fSmearingCoeff));
             } 
+            clock_t resolutionend = clock();
+            resolutiontime += (double)(resolutionend - resolutionstart);
         }//end scatters loop       
         if(light>0.) fSimHist->Fill(light+fOffset);
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
+    clock_t overalend = clock();
+    //std::cout << "Overall time: " << (double)(overalend - overalstart) << std::endl;
+    //std::cout << "Resolution time: " << resolutiontime << std::endl;
 
     fExpHist->SetBinContent(fExpBinNum+1,0);
 
