@@ -146,7 +146,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     //if(fSimTree->GetEntries() > fExpHist->GetEntries()) fSimSortMax = fExpHist->GetEntries();
     //else fSimSortMax = fSimTree->GetEntries();
     
-    if(fSimTree->GetEntries() >= 5e5) fSimSortMax = 5e5;
+    if(fSimTree->GetEntries() >= 2e5) fSimSortMax = 2e5;
     else fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
