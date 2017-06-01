@@ -512,33 +512,68 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
 
 int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
 {
-    std::cout << std::fixed << std::setprecision(5);
     
     fRandom = TRandom3(0);
     
     const int nPar = (const int)fNPar;
     double old_soln[nPar];
-
-    //  generate x(0) - the initial random solution
-    fRandom.RndmArray(fNPar,old_soln);
-    for(int i=0; i<fNPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
-    for(int i=0; i<fNPar; i++) std::cout << "x(0)_" << i << " = " << old_soln[i] << "  ";
-    std::cout << std::endl;
+    double new_soln[nPar];
+    double best_soln[nPar];
     
     double itermax = TMath::Log(T_min/T_0)/TMath::Log(alpha);
     double T = T_0;
+    int iter = 1;
+    double old_chi2, new_chi2, best_chi2, delta;   
+    double start_chi2 = 10;
+
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(3);
+
+    //  generate x(0) - the initial random solution
+    bool badStart = true;
+    std::cout << "\t--->>> Looking for a start w/ chi2 < " << start_chi2 << std::endl << std::endl;
+    std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
+    while(badStart) {
+        fRandom.RndmArray(fNPar,old_soln);
+        for(int i=0; i<fNPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+        for(int i=0; i<fNPar; i++) std::cout << "\t" << old_soln[i];
+        old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+        if(old_chi2 < start_chi2) {
+            std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+            badStart = false;
+        }
+        else {
+            std::cout << "  \tbad start! chi2 = " << old_chi2 << std::endl;
+        }
+   
+    }    
+    
+     
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << std::endl;
+    std::cout << "\tT_i = " << T_0 << " \tT_f = " << T_min << " \talpha = " << alpha << " \t# of iterations = " << (int(itermax)+1) << " \t# of sub-iterations / T = " << fInloopmax << std::endl;
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "\t\ta1\t\ta2\t\ta3\t\ta4\t\t12C\t\tA\t\tB\t\tC" << std::endl;
+    std::cout << "\tHigh\t";
+    for(int i=0; i<fNPar; i++) std::cout << fXhigh[i] << "\t";
+    std::cout << std::endl;
+    std::cout << "\tLow\t";
+    for(int i=0; i<fNPar; i++) std::cout << fXlow[i] << "\t";
+    std::cout << std::endl;
+    std::cout << "\tStep\t";
+    for(int i=0; i<fNPar; i++) std::cout << fXstep[i] << "\t";
+    std::cout << std::endl << std::endl;
+   
 
     //double itermax = 1000;
     //double alpha = 0.98; // factor to reduce the temperature
     //double T = 10000;
     //double T_min = T*TMath::Power(alpha,itermax); // define final temperature based on number of iterations
-    int iter = 1;
-
-    double old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
-    double new_chi2, best_chi2, delta;   
-    double new_soln[nPar];
-    double best_soln[nPar];
-    best_chi2 = 1e9;
+    
+    std::cout << std::fixed << std::setprecision(5);
+    
+    best_chi2 = old_chi2;
     while(T > T_min) {
         for(int inloop = 0; inloop<fInloopmax; inloop++) {        
             SimAnStep(old_soln,new_soln);
