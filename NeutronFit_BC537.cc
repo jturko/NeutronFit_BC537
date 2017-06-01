@@ -212,9 +212,9 @@ void NeutronFit_BC537::Sort(double * par)
     double centroidEkin = 0.;    
     double centroidEres = 0.;    
     
-    clock_t overalstart = clock();
-    double resolutiontime = 0.;
-    double runningtime = 0.;
+    //clock_t overalstart = clock();
+    //double resolutiontime = 0.;
+    //double runningtime = 0.;
     
     int counter = 0;
     
@@ -262,23 +262,23 @@ void NeutronFit_BC537::Sort(double * par)
                 centroidEkin = 0.; 
                 centroidEres = 0.; 
             } 
-            clock_t resolutionstart = clock();
+            //clock_t resolutionstart = clock();
             if(centroidEkin>0.){
                 light += 1000.*fRandom.Gaus(centroidEkin, Resolution(centroidEkin,fSmearingCoeff));
             }
             if(centroidEres>0.){
                 light -= 1000.*fRandom.Gaus(centroidEres, Resolution(centroidEres,fSmearingCoeff));
             } 
-            clock_t resolutionend = clock();
-            resolutiontime += (double)(resolutionend - resolutionstart);
+            //clock_t resolutionend = clock();
+            //resolutiontime += (double)(resolutionend - resolutionstart);
         }//end scatters loop       
         if(light>0.) fSimHist->Fill(light+fOffset);
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
     
-    clock_t overalend = clock();
-    std::cout << "Overall time: " << (int)(overalend - overalstart) << std::endl;
-    std::cout << "Resolution time: " << (int)resolutiontime << std::endl;
+    //clock_t overalend = clock();
+    //std::cout << "Overall time: " << (int)(overalend - overalstart) << std::endl;
+    //std::cout << "Resolution time: " << (int)resolutiontime << std::endl;
 
     fExpHist->SetBinContent(fExpBinNum+1,0);
 
@@ -290,18 +290,18 @@ void NeutronFit_BC537::Sort(double * par)
     std::string title = std::to_string(fEnergy) + " MeV ; #chi^{2} = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());
     
-    if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
-    fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,8);
-    fFitFunc->SetNpx(100);
-    fFitFunc->SetParameters(fParameters[0],fParameters[1],fParameters[2],fParameters[3],fParameters[4],fParameters[5],fParameters[6],fParameters[7]);
-    fFitFunc->SetParLimits(0,0.2,1);
-    fFitFunc->SetParLimits(1,0.5,10);
-    fFitFunc->SetParLimits(2,0.05,0.4);
-    fFitFunc->SetParLimits(3,0.8,1.2);
-    fFitFunc->SetParLimits(4,0,0.1);
-    fFitFunc->SetParLimits(5,0,0.3);
-    fFitFunc->SetParLimits(6,0,0.3);
-    fFitFunc->SetParLimits(7,0,0.05);
+    //if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
+    //fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,8);
+    //fFitFunc->SetNpx(100);
+    //fFitFunc->SetParameters(fParameters[0],fParameters[1],fParameters[2],fParameters[3],fParameters[4],fParameters[5],fParameters[6],fParameters[7]);
+    //fFitFunc->SetParLimits(0,0.2,1);
+    //fFitFunc->SetParLimits(1,0.5,10);
+    //fFitFunc->SetParLimits(2,0.05,0.4);
+    //fFitFunc->SetParLimits(3,0.8,1.2);
+    //fFitFunc->SetParLimits(4,0,0.1);
+    //fFitFunc->SetParLimits(5,0,0.3);
+    //fFitFunc->SetParLimits(6,0,0.3);
+    //fFitFunc->SetParLimits(7,0,0.05);
 
 }
 
