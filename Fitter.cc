@@ -61,6 +61,7 @@ void Fitter::InitializeParameters()
     SetSimAnStep(7,0.001);
 
     fInloopmax = 10;
+    fStartChi2 = 10;
 
     fSum = 0;
     fSum2 = 0;
@@ -524,21 +525,20 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     double T = T_0;
     int iter = 1;
     double old_chi2, new_chi2, best_chi2, delta;   
-    double start_chi2 = 10;
 
     std::cout << std::endl;
     std::cout << std::fixed << std::setprecision(3);
 
     //  generate x(0) - the initial random solution
     bool badStart = true;
-    std::cout << "\t--->>> Looking for a start w/ chi2 < " << start_chi2 << std::endl << std::endl;
+    std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
     std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
     while(badStart) {
         fRandom.RndmArray(fNPar,old_soln);
         for(int i=0; i<fNPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
         for(int i=0; i<fNPar; i++) std::cout << "\t" << old_soln[i];
         old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
-        if(old_chi2 < start_chi2) {
+        if(old_chi2 < fStartChi2) {
             std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
             badStart = false;
         }
@@ -574,6 +574,8 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << std::fixed << std::setprecision(5);
     
     best_chi2 = old_chi2;
+    for(int i=0; i<fNPar; i++) best_soln[i] = old_soln[i];
+    
     while(T > T_min) {
         for(int inloop = 0; inloop<fInloopmax; inloop++) {        
             SimAnStep(old_soln,new_soln);

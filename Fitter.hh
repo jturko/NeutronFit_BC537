@@ -188,6 +188,10 @@ public:
     double * fXlow;
     double * fXstep;
     
+    double fStartChi2;
+    void SetStartChi2(double val) {
+        fStartChi2 = val;
+    }
     int fInloopmax;
     void SetInLoopMax(int val) {
         fInloopmax = val;   
