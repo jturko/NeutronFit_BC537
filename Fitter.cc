@@ -552,6 +552,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << std::fixed << std::setprecision(3);
     std::cout << std::endl;
     std::cout << "\tT_i = " << T_0 << " \tT_f = " << T_min << " \talpha = " << alpha << " \t# of iterations = " << (int(itermax)+1) << " \t# of sub-iterations / T = " << fInloopmax << std::endl;
+    std::cout << "\tOffset = " << fNeutronFit_BC537Vector.at(0).fOffset << std::endl;
     std::cout << std::endl;
     std::cout << std::fixed << std::setprecision(6);
     std::cout << "\t\ta1\t\ta2\t\ta3\t\ta4\t\t12C\t\tA\t\tB\t\tC" << std::endl;
