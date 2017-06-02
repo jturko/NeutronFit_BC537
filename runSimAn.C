@@ -4,8 +4,8 @@
 void runSimAn()
 {
     //Fitter fit(50,37,20,15,18,58,56,52);    
-    Fitter fit(52);    
-
+    Fitter fit(50, 46, 38, 2, 25, 4, 18, 58, 55 ,52);
+    
     fit.SetSimAnHigh(   0,  0.92);      // a1
     fit.SetSimAnLow(    0,  0.55);
     fit.SetSimAnStep(   0,  0.005);
@@ -38,8 +38,8 @@ void runSimAn()
     fit.SetSimAnLow(    7,  0.0001);
     fit.SetSimAnStep(   7,  0.0001);
 
-    fit.SetInLoopMax(50);
-    fit.SetStartChi2(5);    
+    fit.SetInLoopMax(100);
+    fit.SetStartChi2(2);    
 
     double T_i = 10;
     double T_f = 0.01;
