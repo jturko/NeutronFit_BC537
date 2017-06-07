@@ -85,6 +85,9 @@ public:
     }    
     void SetSmearingCoeff(double A, double B, double C) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetSmearingCoeff(A,B,C);
+        fParameters[5] = A;
+        fParameters[6] = B;
+        fParameters[7] = C;
     }
     double GetOffset() { return fNeutronFit_BC537Vector.at(0).GetOffset(); }
     double GetSmearingCoeff(int i) { return fNeutronFit_BC537Vector.at(0).GetSmearingCoeff(i); }
@@ -142,6 +145,21 @@ public:
 
         return val;
     }
+    double FitValue4(const double * par) {
+        double mypar[8];
+        for(int i=0; i<4; i++) mypar[i]=par[i];
+        mypar[4] = fParameters[4];
+        mypar[5] = fParameters[5];
+        mypar[6] = fParameters[6];
+        mypar[7] = fParameters[7];
+        SetParameters(mypar);
+        //if(DidParametersChange(mypar)) SortAllRuns();
+        SortAllRuns();
+        
+        double val = DoChi2();
+
+        return val;
+    }
     bool DidParametersChange(double * par) {
         for(int i=0; i<8; i++) {
             if(TMath::Abs(fParameters[i] - par[i] > 0.00001)) return true;
@@ -151,6 +169,7 @@ public:
     int MinimizeGSL(std::string name="kVectorBFGS");
     int MinimizeSimAn();
     int MyMinimizeSimAn(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
+    int MyMinimizeSimAn4(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
  
 
     void DrawToFile(std::string name);
@@ -173,6 +192,7 @@ public:
     TRandom3 fRandom;
     
     void SimAnStep(double * old_soln, double * new_soln);
+    void SimAnStep4(double * old_soln, double * new_soln);
     
     void SetSimAnHigh(int i, double val) {
         fXhigh[i] = val;
