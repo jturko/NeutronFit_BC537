@@ -83,6 +83,10 @@ public:
     void SetOffset(double offset) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetOffset(offset);
     }    
+    void SetCarbon(double carbon) {
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).fCarbonCoeff[0] = carbon;
+        fParameters[4] = carbon;
+    }    
     void SetSmearingCoeff(double A, double B, double C) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetSmearingCoeff(A,B,C);
         fParameters[5] = A;
