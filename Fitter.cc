@@ -678,7 +678,7 @@ int Fitter::MyMinimizeSimAn4(double alpha, double T_0, double T_min)
     }    
     
      
-    std::cout << std::fixed << std::setprecision(3);
+    std::cout << std::fixed << std::setprecision(5);
     std::cout << std::endl;
     std::cout << "\tT_i = " << T_0 << " \tT_f = " << T_min << " \talpha = " << alpha << " \t# of iterations = " << (int(itermax)+1) << " \t# of sub-iterations / T = " << fInloopmax << std::endl;
     std::cout << "\tOffset = " << fNeutronFit_BC537Vector.at(0).fOffset << std::endl;
@@ -748,6 +748,16 @@ int Fitter::MyMinimizeSimAn4(double alpha, double T_0, double T_min)
     
     Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0],
         fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]);
+
+    if(GetNumberOfNeutronFit_BC537s() == 1) {
+        ofstream outfile;
+        std::string filename = "fit_carbon_" + std::to_string(fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0]) + "_smearing_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0]) + "_" + 
+                                               std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1]) + "_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]) + ".out";
+        outfile.open(filename.c_str(), ios::out | ios::app);
+        outfile << fRunNumVector.at(0) << "\t";
+        outfile << best_soln[0] << "\t" << best_soln[1] << "\t" << best_soln[2] << "\t" << best_soln[3] << "\n";
+        outfile.close();
+    }
 
     return 1;
 }
