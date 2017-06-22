@@ -92,7 +92,8 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     };
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
-    fExpFile = TFile::Open("~/data/hists2012_resort.root"); 
+    //fExpFile = TFile::Open("~/data/hists2012_resort.root"); 
+    fExpFile = TFile::Open("~/data/BC537_bkgsub.root"); 
 
     std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
@@ -148,7 +149,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     if(fSimTree->GetEntries() >= 2e5) fSimSortMax = 2e5;
     else fSimSortMax = fSimTree->GetEntries();
     
-    //fSimSortMax = fSimTree->GetEntries();
+    fSimSortMax = fSimTree->GetEntries();
 
     std::cout << "Run# = " << fRunNum << " ; Energy = " << fEnergy << " MeV ; cutoff(low,high) = (" << fCutoffLow << ","; 
     std::cout << fCutoffHigh << ") " << " ; #evts ratio = " << double(fSimSortMax)/double(fExpHist->GetEntries()) << std::endl;
