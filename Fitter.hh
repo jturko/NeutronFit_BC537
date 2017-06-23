@@ -178,6 +178,15 @@ public:
 
     void DrawToFile(std::string name);
 
+    bool GetUsePolyLightYield() { 
+        if(GetNumberOfNeutronFit_BC537s() != 0) return fNeutronFit_BC537Vector.at(0).GetUsePolyLightYield();
+        else { std::cout << "no neutron fits loaded yet!" << std::endl; return false; }
+    }
+    void SetUsePolyLightYield(bool val = true) {
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            fNeutronFit_BC537Vector.at(i).SetUsePolyLightYield(val);
+        }
+    }
 
     std::vector<NeutronFit_BC537> fNeutronFit_BC537Vector;   
     std::vector<int> fRunNumVector;

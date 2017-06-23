@@ -157,6 +157,8 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     //fExpHist->Rebin(5);
     //if(fExpBinNum == 50100) fExpHist->Rebin(10);
 
+    fUsePolyLightYield = false;
+
 }
 
 NeutronFit_BC537::~NeutronFit_BC537() {}
@@ -241,8 +243,14 @@ void NeutronFit_BC537::Sort(double * par)
                 centroidEres = LightOutput(fEkinVector->at(j)-fEdepVector->at(j), fProtonCoeff);
             }
             else if(fPtypeVector->at(j) == 6) {
-                centroidEkin = LightOutput(fEkinVector->at(j), fDeuteronCoeff);
-                centroidEres = LightOutput(fEkinVector->at(j)-fEdepVector->at(j), fDeuteronCoeff);
+                if(fUsePolyLightYield == true) {
+                    centroidEkin = PolyLightOutput(fEkinVector->at(j), fDeuteronCoeff);
+                    centroidEres = PolyLightOutput(fEkinVector->at(j)-fEdepVector->at(j), fDeuteronCoeff);
+                }
+                else {    
+                    centroidEkin = LightOutput(fEkinVector->at(j), fDeuteronCoeff);
+                    centroidEres = LightOutput(fEkinVector->at(j)-fEdepVector->at(j), fDeuteronCoeff);
+                }
             }
             else if(fPtypeVector->at(j) == 7) {
                 centroidEkin = LightOutput(fEkinVector->at(j), fCarbonCoeff);

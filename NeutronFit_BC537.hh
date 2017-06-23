@@ -67,10 +67,18 @@ public:
 
     void SetParameters(double * par);
 
+    void SetUsePolyLightYield(bool val = true) { 
+        fUsePolyLightYield = val;
+    }
+    bool GetUsePolyLightYield() {
+        return fUsePolyLightYield;
+    }
+    double PolyLightOutput(double E, double * par) {
+        return (0.013271 + 0.00747539*E + 0.213137*TMath::Power(E,2) - 0.0914489*TMath::Power(E,3) + 
+                0.0228428*TMath::Power(E,4) - 0.00275064*TMath::Power(E,5) + 0.000125614*TMath::Power(E,6));
+    }
     double LightOutput(double E, double * par) {
         return ( par[0]*E-par[1]*(1.0-TMath::Exp(-par[2]*TMath::Power(E,par[3]))) );
-        //return (0.013271 + 0.00747539*E + 0.213137*TMath::Power(E,2) - 0.0914489*TMath::Power(E,3) + 
-        //        0.0228428*TMath::Power(E,4) - 0.00275064*TMath::Power(E,5) + 0.000125614*TMath::Power(E,6));
     }
     double Resolution(double E, double * par) {
         return (E*TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(par[1],2)/E+TMath::Power(par[2]/E,2)))/(2.*TMath::Sqrt(2.*TMath::Log(2.))) ;
@@ -178,7 +186,8 @@ public:
     double fExpBinLow;
    
     bool fRebin;
-    
+
+    bool fUsePolyLightYield;    
 
 };
 
