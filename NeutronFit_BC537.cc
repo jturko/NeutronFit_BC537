@@ -245,7 +245,7 @@ void NeutronFit_BC537::Sort(double * par)
             else if(fPtypeVector->at(j) == 6) {
                 if(fUsePolyLightYield == true) {
                     centroidEkin = PolyLightOutput(fEkinVector->at(j), fDeuteronCoeff);
-                    centroidEres = PolyLightOutput(fEkinVector->at(j)-fEdepVector->at(j), fDeuteronCoeff);
+                    centroidEres = PolyLightOutputWall(fEkinVector->at(j)-fEdepVector->at(j), fDeuteronCoeff);
                 }
                 else {    
                     centroidEkin = LightOutput(fEkinVector->at(j), fDeuteronCoeff);

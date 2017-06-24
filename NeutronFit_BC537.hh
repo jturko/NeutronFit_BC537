@@ -77,6 +77,10 @@ public:
         return (0.013271 + 0.00747539*E + 0.213137*TMath::Power(E,2) - 0.0914489*TMath::Power(E,3) + 
                 0.0228428*TMath::Power(E,4) - 0.00275064*TMath::Power(E,5) + 0.000125614*TMath::Power(E,6));
     }
+    double PolyLightOutputWall(double E, double * par) {
+        return (0.00747539*E + 0.213137*TMath::Power(E,2) - 0.0914489*TMath::Power(E,3) + 
+                0.0228428*TMath::Power(E,4) - 0.00275064*TMath::Power(E,5) + 0.000125614*TMath::Power(E,6));
+    }
     double LightOutput(double E, double * par) {
         return ( par[0]*E-par[1]*(1.0-TMath::Exp(-par[2]*TMath::Power(E,par[3]))) );
     }
