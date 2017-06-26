@@ -286,7 +286,7 @@ void NeutronFit_BC537::Sort(double * par)
             //clock_t resolutionend = clock();
             //resolutiontime += (double)(resolutionend - resolutionstart);
         }//end scatters loop
-        if( (light+(fOffset/1000.)) > 0. ) {
+        if( (light+(fOffset/1000.)) > 0. && light > 0.) {
             light = 1000.*fRandom.Gaus(light+(fOffset/1000.),Resolution(light+(fOffset/1000.),fSmearingCoeff));
             fSimHist->Fill(light);
         }
