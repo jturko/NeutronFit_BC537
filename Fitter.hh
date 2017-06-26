@@ -31,6 +31,7 @@ public:
 
     void Draw();
     void Run(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.123, double B=0.125, double C=0.0074);
+    void RunOffset(double a1, double a2, double a3, double a4, double offset);
 
     bool Check(int i) { if(i<=-1||i>=GetNumberOfNeutronFit_BC537s()) return false; else return true; }
     

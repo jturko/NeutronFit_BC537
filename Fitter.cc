@@ -12,6 +12,8 @@ void Fitter::InitializeParameters()
     fParameters[6] = 0.125;
     fParameters[7] = 0.0074;
     
+    SetSmearingCoeff(0.130631,0.135853,1.20556e-6); 
+   
     fMinimizeCounter = 0;
  
     fNPar = 8;
@@ -173,6 +175,37 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
     InitializeParameters();
 }
 
+void Fitter::RunOffset(double a1, double a2, double a3, double a4, double offset) 
+{
+    SetParameters(a1,a2,a3,a4, fParameters[4],fParameters[5],fParameters[6],fParameters[7]);   
+    SetOffset(offset);
+    PrintParameters();
+    if(!fCanvas) {
+        fCanvas = new TCanvas();
+        if(GetNumberOfNeutronFit_BC537s() == 1) fCanvas->Divide(1);
+        else if(GetNumberOfNeutronFit_BC537s() == 2) fCanvas->Divide(2);
+        else if(GetNumberOfNeutronFit_BC537s() == 3) fCanvas->Divide(3);
+        else if(GetNumberOfNeutronFit_BC537s() == 4) fCanvas->Divide(2,2);
+        else if(GetNumberOfNeutronFit_BC537s() == 6) fCanvas->Divide(2,3);
+        else if(GetNumberOfNeutronFit_BC537s() == 8) fCanvas->Divide(2,4);
+        else if(GetNumberOfNeutronFit_BC537s() == 10) fCanvas->Divide(2,5);
+        else { std::cout << "more/less NeutronFit_BC537s that I know how to draw!" << std::endl; return; }
+    }
+    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+        SortRun(i);
+        fCanvas->cd(i+1);
+        gPad->Clear();
+        fNeutronFit_BC537Vector.at(i).Draw();
+        gPad->Update();
+    }
+    fSum = 0.;
+    fSum2 = 0.;
+    for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
+    for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
+    fSum /= double(GetNumberOfNeutronFit_BC537s());
+    fSum2 /= double(GetNumberOfNeutronFit_BC537s());
+    std::cout << "sum(chi2)/nfits = " << fSum << " | sum((chi2)^2)/nfits = " << fSum2 << std::endl;
+}
 void Fitter::Run(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) 
 {
     SetParameters(a1,a2,a3,a4,carbon,A,B,C);

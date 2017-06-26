@@ -138,11 +138,11 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fParameters[2] = 0.373;
     fParameters[3] = 0.968;
     fParameters[4] = 0.0;
-    fParameters[5] = 0.123;
-    fParameters[6] = 0.125;
-    fParameters[7] = 0.0074;
+    fParameters[5] = 0.1306;
+    fParameters[6] = 0.1359;
+    fParameters[7] = 1.21e-6;
     SetParameters(fParameters);
-   
+    
     fOffset = 0;
 
     //fSimSortMax = 200000;
