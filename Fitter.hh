@@ -174,6 +174,7 @@ public:
     int MinimizeSimAn();
     int MyMinimizeSimAn(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
     int MyMinimizeSimAn4(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
+    int MyMinimizeSimAn5(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
  
 
     void DrawToFile(std::string name);
@@ -206,6 +207,7 @@ public:
     
     void SimAnStep(double * old_soln, double * new_soln);
     void SimAnStep4(double * old_soln, double * new_soln);
+    void SimAnStep5(double * old_soln, double * new_soln);
     
     void SetSimAnHigh(int i, double val) {
         fXhigh[i] = val;
@@ -220,7 +222,19 @@ public:
     double * fXhigh;
     double * fXlow;
     double * fXstep;
-    
+    double fXlowOffset;    
+    double fXhighOffset;
+    double fXstepOffset;
+    void SetSimAnLowOffset(double val) {
+        fXlowOffset = val;
+    }    
+    void SetSimAnHighOffset(double val) {
+        fXhighOffset = val;
+    }    
+    void SetSimAnStepOffset(double val) {
+        fXstepOffset = val;
+    }    
+
     double fStartChi2;
     void SetStartChi2(double val) {
         fStartChi2 = val;
