@@ -110,7 +110,10 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fExpBinNum = fExpHist->GetNbinsX();
     fExpBinHigh = fExpHist->GetBinLowEdge(fExpBinNum+1);
     fExpBinLow = fExpHist->GetBinLowEdge(1);
-    
+    for(int i=0; i<fExpBinNum; i++) {
+        if(fExpHist->GetBinContent(i)<0.) fExpHist->SetBinContent(i,0.);
+    }    
+
     std::string name = "~/data/smearing/deuteron/G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());     
 
@@ -271,18 +274,22 @@ void NeutronFit_BC537::Sort(double * par)
             else { 
                 centroidEkin = 0.; 
                 centroidEres = 0.; 
-            } 
-            //clock_t resolutionstart = clock();
-            if(centroidEkin>0.){
-                light += 1000.*fRandom.Gaus(centroidEkin, Resolution(centroidEkin,fSmearingCoeff));
             }
-            if(centroidEres>0.){
-                light -= 1000.*fRandom.Gaus(centroidEres, Resolution(centroidEres,fSmearingCoeff));
-            } 
+            light = light + centroidEkin - centroidEres; 
+            //clock_t resolutionstart = clock();
+            //if(centroidEkin>0.){
+            //    light += 1000.*fRandom.Gaus(centroidEkin, Resolution(centroidEkin,fSmearingCoeff));
+            //}
+            //if(centroidEres>0.){
+            //    light -= 1000.*fRandom.Gaus(centroidEres, Resolution(centroidEres,fSmearingCoeff));
+            //} 
             //clock_t resolutionend = clock();
             //resolutiontime += (double)(resolutionend - resolutionstart);
-        }//end scatters loop       
-        if(light>0.) fSimHist->Fill(light+fOffset);
+        }//end scatters loop
+        if( (light+(fOffset/1000.)) > 0. ) {
+            light = 1000.*fRandom.Gaus(light+(fOffset/1000.),Resolution(light+(fOffset/1000.),fSmearingCoeff));
+            fSimHist->Fill(light);
+        }
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
     
