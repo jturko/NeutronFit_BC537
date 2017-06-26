@@ -15,7 +15,7 @@ void Fitter::InitializeParameters()
     fMinimizeCounter = 0;
  
     fNPar = 8;
-    const int nPar = (const int)fNPar; 
+    //const int nPar = (const int)fNPar; 
     fXhigh = new double[fNPar];
     fXlow = new double[fNPar];
     fXstep = new double[fNPar];
@@ -578,7 +578,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
             badStart = false;
         }
         else {
-            std::cout << "  \tbad start! chi2 = " << old_chi2 << std::endl;
+            std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
         }
    
     }    
@@ -766,10 +766,10 @@ int Fitter::MyMinimizeSimAn4(double alpha, double T_0, double T_min)
         fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]);
 
     if(GetNumberOfNeutronFit_BC537s() == 1) {
-        ofstream outfile;
+        std::ofstream outfile;
         std::string filename = "fit_carbon_" + std::to_string(fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0]) + "_smearing_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0]) + "_" + 
                                                std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1]) + "_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]) + ".out";
-        outfile.open(filename.c_str(), ios::out | ios::app);
+        outfile.open(filename.c_str(), std::ios::out | std::ios::app);
         outfile << fRunNumVector.at(0) << "\t";
         outfile << best_soln[0] << "\t" << best_soln[1] << "\t" << best_soln[2] << "\t" << best_soln[3] << "\n";
         outfile.close();
@@ -808,11 +808,11 @@ int Fitter::MyMinimizeSimAn5(double alpha, double T_0, double T_min)
         SetOffset(old_soln[4]);
         old_chi2 = FitValue4((const double *)old_soln); // evaluate initial guess x(0) chi2
         if(old_chi2 < fStartChi2) {
-            std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+            std::cout << " \t\tgood start! chi2 = " << old_chi2 << std::endl;
             badStart = false;
         }
         else {
-            std::cout << "  \tbad start! chi2 = " << old_chi2 << std::endl;
+            std::cout << " \t\tbad start! chi2 = " << old_chi2 << std::endl;
         }
    
     }    
@@ -886,19 +886,9 @@ int Fitter::MyMinimizeSimAn5(double alpha, double T_0, double T_min)
     //for(int i=0; i<nPar; i++) std::cout << best_soln[i] << " , ";
     //std::cout << std::endl;
         
-    SetOffset(best_soln[4]);
-    Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0],
-        fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]);
-
-    if(GetNumberOfNeutronFit_BC537s() == 1) {
-        ofstream outfile;
-        std::string filename = "fit_carbon_" + std::to_string(fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0]) + "_smearing_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0]) + "_" + 
-                                               std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1]) + "_" + std::to_string(fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]) + ".out";
-        outfile.open(filename.c_str(), ios::out | ios::app);
-        outfile << fRunNumVector.at(0) << "\t";
-        outfile << best_soln[0] << "\t" << best_soln[1] << "\t" << best_soln[2] << "\t" << best_soln[3] << "\n";
-        outfile.close();
-    }
+    //SetOffset(best_soln[4]);
+    //Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0],
+    //    fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]);
 
     return 1;
 }
