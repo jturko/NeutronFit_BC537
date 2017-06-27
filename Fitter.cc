@@ -16,7 +16,7 @@ void Fitter::InitializeParameters()
    
     fMinimizeCounter = 0;
  
-    fNPar = 8;
+    fNPar = 9;
     //const int nPar = (const int)fNPar; 
     fXhigh = new double[fNPar];
     fXlow = new double[fNPar];
@@ -535,7 +535,7 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
     fRandom = TRandom3(0);
     //fRandom.RndmArray(fNPar,new_soln);
 
-    for(int i=0; i<fNPar; i++) {
+    for(int i=0; i<8; i++) {
         bool go = true;
         while(go) {
             //std::cout << "par " << i << " randomization ... " << std::endl;
@@ -552,7 +552,6 @@ void Fitter::SimAnStep(double * old_soln, double * new_soln)
 void Fitter::SimAnStep4(double * old_soln, double * new_soln) 
 {
     fRandom = TRandom3(0);
-    //fRandom.RndmArray(fNPar,new_soln);
 
     for(int i=0; i<4; i++) {
         bool go = true;
@@ -578,13 +577,25 @@ void Fitter::SimAnStep5(double * old_soln, double * new_soln)
         if(new_soln[4] > fXlowOffset && new_soln[4] < fXhighOffset) go = false;
     }
 }
+void Fitter::SimAnStep9(double * old_soln, double * new_soln) 
+{
+    fRandom = TRandom3(0);
+    for(int i=0; i<9; i++) {
+        bool go = true;
+        while(go) {
+            new_soln[i] = fRandom.Rndm();
+            new_soln[i] = (old_soln[i]-fXstep[i]) + new_soln[i]*2*fXstep[i];
+            if(new_soln[i] > fXlow[i] && new_soln[i] < fXhigh[i]) go = false;    
+        }
+    } 
+}
 
 int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
 {
     
     fRandom = TRandom3(0);
     
-    const int nPar = (const int)fNPar;
+    const int nPar = 8;
     double old_soln[nPar];
     double new_soln[nPar];
     double best_soln[nPar];
@@ -602,9 +613,9 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
     std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
     while(badStart) {
-        fRandom.RndmArray(fNPar,old_soln);
-        for(int i=0; i<fNPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
-        for(int i=0; i<fNPar; i++) std::cout << "\t" << old_soln[i];
+        fRandom.RndmArray(nPar,old_soln);
+        for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+        for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
         old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
         if(old_chi2 < fStartChi2) {
             std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
@@ -625,13 +636,13 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << std::fixed << std::setprecision(6);
     std::cout << "\t\ta1\t\ta2\t\ta3\t\ta4\t\t12C\t\tA\t\tB\t\tC" << std::endl;
     std::cout << "\tHigh\t";
-    for(int i=0; i<fNPar; i++) std::cout << fXhigh[i] << "\t";
+    for(int i=0; i<nPar; i++) std::cout << fXhigh[i] << "\t";
     std::cout << std::endl;
     std::cout << "\tLow\t";
-    for(int i=0; i<fNPar; i++) std::cout << fXlow[i] << "\t";
+    for(int i=0; i<nPar; i++) std::cout << fXlow[i] << "\t";
     std::cout << std::endl;
     std::cout << "\tStep\t";
-    for(int i=0; i<fNPar; i++) std::cout << fXstep[i] << "\t";
+    for(int i=0; i<nPar; i++) std::cout << fXstep[i] << "\t";
     std::cout << std::endl << std::endl;
    
 
@@ -643,7 +654,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << std::fixed << std::setprecision(5);
     
     best_chi2 = old_chi2;
-    for(int i=0; i<fNPar; i++) best_soln[i] = old_soln[i];
+    for(int i=0; i<nPar; i++) best_soln[i] = old_soln[i];
     
     while(T > T_min) {
         for(int inloop = 0; inloop<fInloopmax; inloop++) {        
@@ -652,7 +663,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
             if(new_chi2 < best_chi2) {
                 best_chi2 = new_chi2;
                 std::cout << "\t--->>> new best fit! - chi2 = " << best_chi2 << "\t ( ";
-                for(int i=0; i<fNPar; i++) {
+                for(int i=0; i<nPar; i++) {
                     best_soln[i] = new_soln[i];
                     std::cout << best_soln[i] << " , "; 
                 }
@@ -667,11 +678,11 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
             if(inloop==0) std::cout << "Iter " << iter << "/" << (int(itermax)+1) << "\t T = " << T << "\t old = " << old_chi2 << "\t new = " << new_chi2 << "\t chance = " << chance << std::endl;
             
             if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
-                for(int i=0; i<fNPar; i++) old_soln[i] = new_soln[i];
+                for(int i=0; i<nPar; i++) old_soln[i] = new_soln[i];
                 old_chi2 = new_chi2;
             }       
         }
-        //for(int i=0; i<fNPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
+        //for(int i=0; i<nPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
         //std::cout << std::endl;
     
         T *= alpha;
@@ -679,7 +690,7 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     }
 
     //std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
-    //for(int i=0; i<fNPar; i++) std::cout << best_soln[i] << " , ";
+    //for(int i=0; i<nPar; i++) std::cout << best_soln[i] << " , ";
     //std::cout << std::endl;
     
     Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],best_soln[4],best_soln[5],best_soln[6],best_soln[7]);
@@ -922,6 +933,117 @@ int Fitter::MyMinimizeSimAn5(double alpha, double T_0, double T_min)
     //SetOffset(best_soln[4]);
     //Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],fNeutronFit_BC537Vector.at(0).fCarbonCoeff[0],
     //    fNeutronFit_BC537Vector.at(0).fSmearingCoeff[0],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[1],fNeutronFit_BC537Vector.at(0).fSmearingCoeff[2]);
+
+    return 1;
+}
+
+
+int Fitter::MyMinimizeSimAn9(double alpha, double T_0, double T_min)
+{
+    
+    fRandom = TRandom3(0);
+    
+    const int nPar = 9;
+    double old_soln[nPar];
+    double new_soln[nPar];
+    double best_soln[nPar];
+    
+    double itermax = TMath::Log(T_min/T_0)/TMath::Log(alpha);
+    double T = T_0;
+    int iter = 1;
+    double old_chi2, new_chi2, best_chi2, delta;   
+
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(3);
+
+    //  generate x(0) - the initial random solution
+    bool badStart = true;
+    std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
+    std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC\tOffset" << std::endl;
+    while(badStart) {
+        fRandom.RndmArray(nPar,old_soln);
+        for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+        for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
+        SetOffset(old_soln[8]);
+        old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+        if(old_chi2 < fStartChi2) {
+            std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+            badStart = false;
+        }
+        else {
+            std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
+        }
+   
+    }    
+    
+     
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << std::endl;
+    std::cout << "\tT_i = " << T_0 << " \tT_f = " << T_min << " \talpha = " << alpha << " \t# of iterations = " << (int(itermax)+1) << " \t# of sub-iterations / T = " << fInloopmax << std::endl;
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "\t\ta1\t\ta2\t\ta3\t\ta4\t\t12C\t\tA\t\tB\t\tC\t\tOffset" << std::endl;
+    std::cout << "\tHigh\t";
+    for(int i=0; i<nPar; i++) std::cout << fXhigh[i] << "\t";
+    std::cout << std::endl;
+    std::cout << "\tLow\t";
+    for(int i=0; i<nPar; i++) std::cout << fXlow[i] << "\t";
+    std::cout << std::endl;
+    std::cout << "\tStep\t";
+    for(int i=0; i<nPar; i++) std::cout << fXstep[i] << "\t";
+    std::cout << std::endl << std::endl;
+   
+
+    //double itermax = 1000;
+    //double alpha = 0.98; // factor to reduce the temperature
+    //double T = 10000;
+    //double T_min = T*TMath::Power(alpha,itermax); // define final temperature based on number of iterations
+    
+    std::cout << std::fixed << std::setprecision(5);
+    
+    best_chi2 = old_chi2;
+    for(int i=0; i<nPar; i++) best_soln[i] = old_soln[i];
+    
+    while(T > T_min) {
+        for(int inloop = 0; inloop<fInloopmax; inloop++) {        
+            SimAnStep(old_soln,new_soln);
+            SetOffset(new_soln[8]);
+            new_chi2 = FitValue((const double *)new_soln);
+            if(new_chi2 < best_chi2) {
+                best_chi2 = new_chi2;
+                std::cout << "\t--->>> new best fit! - chi2 = " << best_chi2 << "\t ( ";
+                for(int i=0; i<nPar; i++) {
+                    best_soln[i] = new_soln[i];
+                    std::cout << best_soln[i] << " , "; 
+                }
+                std::cout << "\b\b)" << std::endl;
+            }
+            delta = TMath::Abs(old_chi2 - new_chi2);
+            double chance;
+            if(new_chi2 < old_chi2) chance = 1;
+            else chance = TMath::Exp(-delta/T);
+            double rando = fRandom.Rndm();
+            
+            if(inloop==0) std::cout << "Iter " << iter << "/" << (int(itermax)+1) << "\t T = " << T << "\t old = " << old_chi2 << "\t new = " << new_chi2 << "\t chance = " << chance << std::endl;
+            
+            if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
+                for(int i=0; i<nPar; i++) old_soln[i] = new_soln[i];
+                old_chi2 = new_chi2;
+            }       
+        }
+        //for(int i=0; i<nPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
+        //std::cout << std::endl;
+    
+        T *= alpha;
+        iter++;
+    }
+
+    //std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
+    //for(int i=0; i<nPar; i++) std::cout << best_soln[i] << " , ";
+    //std::cout << std::endl;
+        
+    SetOffset(best_soln[8]);
+    Run(best_soln[0],best_soln[1],best_soln[2],best_soln[3],best_soln[4],best_soln[5],best_soln[6],best_soln[7]);
 
     return 1;
 }

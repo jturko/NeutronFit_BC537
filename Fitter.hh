@@ -58,13 +58,13 @@ public:
         else{ std::cout << "out of bounds!" << std::endl;} 
     }
     
-    void SortAllRuns() { 
+    void SortAllRuns(bool print = false) { 
         //PrintParameters();
         for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) {
-            std::cout << " sorting run " << num+1 << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
+            if(print) std::cout << " sorting run " << num+1 << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
             SortRun(num);
         } 
-        std::cout << std::endl;
+        if(print) std::cout << std::endl;
         DoChi2();
     }
     
@@ -189,6 +189,7 @@ public:
     int MyMinimizeSimAn(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
     int MyMinimizeSimAn4(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
     int MyMinimizeSimAn5(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
+    int MyMinimizeSimAn9(double alpha = 0.98, double T_0 = 20, double T_min = 0.1);   
  
 
     void DrawToFile(std::string name);
@@ -228,6 +229,7 @@ public:
     void SimAnStep(double * old_soln, double * new_soln);
     void SimAnStep4(double * old_soln, double * new_soln);
     void SimAnStep5(double * old_soln, double * new_soln);
+    void SimAnStep9(double * old_soln, double * new_soln);
     
     void SetSimAnHigh(int i, double val) {
         fXhigh[i] = val;
@@ -246,13 +248,13 @@ public:
     double fXhighOffset;
     double fXstepOffset;
     void SetSimAnLowOffset(double val) {
-        fXlowOffset = val;
+        fXlowOffset = fXlow[8] = val;
     }    
     void SetSimAnHighOffset(double val) {
-        fXhighOffset = val;
+        fXhighOffset = fXhigh[8] = val;
     }    
     void SetSimAnStepOffset(double val) {
-        fXstepOffset = val;
+        fXstepOffset = fXstep[8] = val;
     }    
 
     double fStartChi2;
