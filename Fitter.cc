@@ -1006,7 +1006,7 @@ int Fitter::MyMinimizeSimAn9(double alpha, double T_0, double T_min)
     
     while(T > T_min) {
         for(int inloop = 0; inloop<fInloopmax; inloop++) {        
-            SimAnStep(old_soln,new_soln);
+            SimAnStep9(old_soln,new_soln);
             SetOffset(new_soln[8]);
             new_chi2 = FitValue((const double *)new_soln);
             if(new_chi2 < best_chi2) {
