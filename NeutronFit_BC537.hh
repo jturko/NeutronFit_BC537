@@ -66,6 +66,13 @@ public:
     double GetOffset() { return fOffset; }
 
     void SetParameters(double * par);
+    void Set5Parameters(double a1, double a2, double a3, double a4, double offset) {
+        fParameters[0] = fDeuteronCoeff[0] = a1;
+        fParameters[1] = fDeuteronCoeff[1] = a2;
+        fParameters[2] = fDeuteronCoeff[2] = a3;
+        fParameters[3] = fDeuteronCoeff[3] = a4;
+        fOffset = offset;
+    }
 
     void SetUsePolyLightYield(bool val = true) { 
         fUsePolyLightYield = val;

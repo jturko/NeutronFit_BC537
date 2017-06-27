@@ -60,7 +60,11 @@ public:
     
     void SortAllRuns() { 
         //PrintParameters();
-        for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) SortRun(num); 
+        for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) {
+            std::cout << " sorting run " << num+1 << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
+            SortRun(num);
+        } 
+        std::cout << std::endl;
         DoChi2();
     }
     
@@ -80,6 +84,15 @@ public:
     void SetParameters(double * par) { // expects a par array w/ 8 elements
         for(int i=0; i<8; i++) fParameters[i] = par[i];
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetParameters(fParameters);
+    }
+    void Set5Parameters(double a1, double a2, double a3, double a4, double offset) {
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            fNeutronFit_BC537Vector.at(i).Set5Parameters(a1,a2,a3,a4,offset);
+        }
+        fParameters[0] = a1;
+        fParameters[1] = a2;
+        fParameters[2] = a3;
+        fParameters[3] = a4;
     }
     void SetOffset(double offset) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fNeutronFit_BC537Vector.at(i).SetOffset(offset);
@@ -187,6 +200,12 @@ public:
     void SetUsePolyLightYield(bool val = true) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
             fNeutronFit_BC537Vector.at(i).SetUsePolyLightYield(val);
+        }
+    }
+
+    void LoadAll() {
+        for(int i=0; i<=63; i++) {
+            SetNextNeutronFit_BC537(i);
         }
     }
 
