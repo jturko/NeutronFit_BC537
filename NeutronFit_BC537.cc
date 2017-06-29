@@ -2,6 +2,7 @@
 #include "NeutronFit_BC537.hh"
 
 NeutronFit_BC537::NeutronFit_BC537(int run_num) :
+    fFitFunc(NULL),
     fRunNum(run_num),
     fSimFile(NULL),
     fExpFile(NULL),
@@ -14,7 +15,6 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fEdepVector(NULL),
     fEkinVector(NULL),
     fPtypeVector(NULL),
-    fFitFunc(NULL),
     fRebin(false)
 {
     
