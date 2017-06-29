@@ -1,7 +1,7 @@
 
-CXX=g++
-CXXFLAGS=-Wall
-ROOTLIBS=-lMathMore -lProof
+CXX = g++
+CXXFLAGS = -Wall
+ROOTLIBS = -lMathMore -lProof
 ROOTCONFIG=`root-config --cflags --glibs`
 HEADERS = NeutronFit_BC537.hh Fitter.hh
 SOURCES = NeutronFit_BC537.cc Fitter.cc
