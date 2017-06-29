@@ -1,9 +1,9 @@
 
 #ifndef FITTER_H
 #define FITTER_H
-#endif
 
-#include "NeutronFit_BC537.cc"
+//#include "NeutronFit_BC537.cc"
+#include "NeutronFit_BC537.hh"
 #include "vec.hh"
 
 #include "Math/GSLMinimizer.h"
@@ -271,3 +271,4 @@ public:
 
 };
 
+#endif

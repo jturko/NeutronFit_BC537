@@ -1,7 +1,6 @@
 
 #ifndef NEUTRONFIT_BC537_H
 #define NEUTRONFIT_BC537_H
-#endif
 
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -202,3 +201,4 @@ public:
 
 };
 
+#endif
