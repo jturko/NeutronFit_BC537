@@ -72,7 +72,7 @@ public:
         fNeutronFit_BC537Vector.at(i).Draw(); 
     }
     
-    void * SortRunMT(void * ptr) {
+    void SortRunMT(void * ptr) {
         //MT_args tmpArgs = *((MT_args*)ptr);
         //std::cout << "run num = " << tmpArgs.GetRun() << std::endl;
         //SortRun(tmpArgs.sRun);
@@ -86,7 +86,7 @@ public:
 
         SortRun(num);
         
-        return 0;
+        //return 0;
     }
     void SortAllRunsMT();
 

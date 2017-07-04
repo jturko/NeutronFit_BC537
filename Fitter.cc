@@ -282,9 +282,14 @@ void Fitter::SortAllRunsMT()
             //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
             
             //tvec.at(i)->Run();
-            fThreadVector.at(i)->SetCancelOff();
+            //fThreadVector.at(i)->SetCancelOff();
             fThreadVector.at(i)->Run();
             std::cout << "state = " << fThreadVector.at(i)->GetState() << std::endl;
+        }
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            std::cout << "trying to join thread " << i << std::endl;
+            fThreadVector.at(i)->Join();
+            std::cout << "done! " << i << std::endl;
         }
     }
     else { std::cout << "more than 10 runs, not sorting!" << std::endl; }
@@ -297,7 +302,8 @@ void Fitter::SortAllRunsMT()
 void Fitter::SetNextNeutronFit_BC537(int i) {
     NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
     SetNextNeutronFit_BC537(*hfit);
-    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
+    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
 } 
 
 vec Fitter::NelderMead(vec initial_vec, int itermax)
