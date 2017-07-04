@@ -1,7 +1,6 @@
 
 #ifndef VEC_H
 #define VEC_H
-#endif
 
 #include <iostream>
 #include <fstream>
@@ -84,3 +83,4 @@ private:
     double fArray[8];
 };
 
+#endif

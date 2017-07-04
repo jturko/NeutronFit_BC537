@@ -9,5 +9,6 @@
 
 #pragma link C++ defined_in "NeutronFit_BC537.hh";
 #pragma link C++ defined_in "Fitter.hh";
+#pragma link C++ defined_in "vec.hh";
 
 #endif

@@ -260,6 +260,28 @@ void Fitter::DrawToFile(std::string input)
 
 }
 
+void Fitter::SortAllRunsMT() 
+{
+    std::vector<TThread*> tvec;
+    void * tmpargs = malloc(sizeof(MT_args));
+
+    if(GetNumberOfNeutronFit_BC537s() <= 10) {
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+            //MT_args tmpargs(this,i);
+            
+            *((MT_args*)tmpargs) = MT_args(i,this);
+            tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
+            
+            tvec.at(i)->Run();
+        }
+    }
+    else { std::cout << "more than 10 runs, not sorting!" << std::endl; }
+    
+    //for(int i=0; i<(int)tvec.size(); i++) delete tvec.at(i);
+
+}
+
 vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
     std::cout << "starting Nelder Mead method... " << std::endl;
@@ -1047,3 +1069,4 @@ int Fitter::MyMinimizeSimAn9(double alpha, double T_0, double T_min)
 
     return 1;
 }
+

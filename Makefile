@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -Wall -fPIC
 ROOTLIBS = -lMathMore -lProof
 ROOTCONFIG=`root-config --cflags --glibs`
-HEADERS = NeutronFit_BC537.hh Fitter.hh
+HEADERS = NeutronFit_BC537.hh Fitter.hh vec.hh
 SOURCES = NeutronFit_BC537.cc Fitter.cc
 
 libFitter.so: FitterDict.cxx $(SOURCES)

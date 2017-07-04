@@ -1,4 +1,5 @@
 
+
 #ifndef FITTER_H
 #define FITTER_H
 
@@ -7,6 +8,7 @@
 #include "vec.hh"
 
 #include "TCanvas.h"
+#include "TThread.h"
 
 #include "Math/GSLMinimizer.h"
 #include "Math/GSLSimAnMinimizer.h"
@@ -15,6 +17,21 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+
+class Fitter;
+
+struct MT_args
+{
+    MT_args(int run, Fitter * fit) {
+        sFit = fit;
+        sRun = run;
+    }   
+    int GetRun() { return sRun; }
+    Fitter * GetFit() { return sFit; }
+
+    int sRun;   
+    Fitter * sFit;
+};
 
 class Fitter 
 {
@@ -53,11 +70,13 @@ public:
         fNeutronFit_BC537Vector.at(i).Draw(); 
     }
     
-    void * SortRunT(void * ptr) {
-        long run = (long) ptr;
-        SortRun(run);
+    void * SortRunMT(void * ptr) {
+        MT_args tmpArgs = *((MT_args*)ptr);
+        std::cout << "run num = " << tmpArgs.GetRun() << std::endl;
+        SortRun(tmpArgs.sRun);
         return 0;
     }
+    void SortAllRunsMT();
 
     void SortRun(int num) { 
         if(Check(num)) { 
@@ -75,7 +94,7 @@ public:
         if(print) std::cout << std::endl;
         DoChi2();
     }
-    
+   
     void Print() { for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) std::cout << "Run# = " << fRunNumVector.at(num) << " ; Energy = " << fNeutronFit_BC537Vector.at(num).GetEnergy() << std::endl; } 
 
     void SetParameters(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) {
