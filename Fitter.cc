@@ -72,6 +72,8 @@ void Fitter::InitializeParameters()
 
     fSum = 0;
     fSum2 = 0;
+
+    fCurrentSortMT = 0;
 }
 
 void Fitter::Draw()
@@ -263,15 +265,15 @@ void Fitter::DrawToFile(std::string input)
 void Fitter::SortAllRunsMT() 
 {
     std::vector<TThread*> tvec;
-    void * tmpargs = malloc(sizeof(MT_args));
+    //void * tmpargs = malloc(sizeof(MT_args));
 
     if(GetNumberOfNeutronFit_BC537s() <= 10) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+            tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
             //MT_args tmpargs(this,i);
             
-            *((MT_args*)tmpargs) = MT_args(i,this);
-            tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
+            //*((MT_args*)tmpargs) = MT_args(i,this);
+            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
             
             tvec.at(i)->Run();
         }

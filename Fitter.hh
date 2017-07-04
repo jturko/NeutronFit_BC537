@@ -71,9 +71,19 @@ public:
     }
     
     void * SortRunMT(void * ptr) {
-        MT_args tmpArgs = *((MT_args*)ptr);
-        std::cout << "run num = " << tmpArgs.GetRun() << std::endl;
-        SortRun(tmpArgs.sRun);
+        //MT_args tmpArgs = *((MT_args*)ptr);
+        //std::cout << "run num = " << tmpArgs.GetRun() << std::endl;
+        //SortRun(tmpArgs.sRun);
+ 
+        TThread::Lock();
+        int num = fCurrentSortMT;
+        std::cout << "tring to sort run " << fCurrentSortMT << std::endl;
+        if(fCurrentSortMT < (GetNumberOfNeutronFit_BC537s()-1)) fCurrentSortMT++;
+        else fCurrentSortMT = 0;
+        TThread::UnLock();
+
+        SortRun(num);
+        
         return 0;
     }
     void SortAllRunsMT();
@@ -295,6 +305,8 @@ public:
     int GetInLoopMax() {
         return fInloopmax;
     }    
+
+    int fCurrentSortMT;
 
 };
 
