@@ -6,6 +6,8 @@
 #include "NeutronFit_BC537.hh"
 #include "vec.hh"
 
+#include "TCanvas.h"
+
 #include "Math/GSLMinimizer.h"
 #include "Math/GSLSimAnMinimizer.h"
 #include "Math/Functor.h"
@@ -51,6 +53,12 @@ public:
         fNeutronFit_BC537Vector.at(i).Draw(); 
     }
     
+    void * SortRunT(void * ptr) {
+        long run = (long) ptr;
+        SortRun(run);
+        return 0;
+    }
+
     void SortRun(int num) { 
         if(Check(num)) { 
             fNeutronFit_BC537Vector.at(num).Sort(fParameters); 
