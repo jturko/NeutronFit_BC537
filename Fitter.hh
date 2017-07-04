@@ -57,10 +57,12 @@ public:
     NeutronFit_BC537 * GetNeutronFit_BC537(int i) { if(Check(i)) return &fNeutronFit_BC537Vector[i]; else{ std::cout << "out of bounds!" << std::endl; return NULL;} }
     
     void SetNextNeutronFit_BC537(NeutronFit_BC537 hfit) { fNeutronFit_BC537Vector.push_back(hfit); fRunNumVector.push_back(hfit.GetRunNum());  }
-    void SetNextNeutronFit_BC537(int i) {
-        NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
-        SetNextNeutronFit_BC537(*hfit);
-    }    
+    void SetNextNeutronFit_BC537(int i);
+    //void SetNextNeutronFit_BC537(int i) {
+    //    NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
+    //    SetNextNeutronFit_BC537(*hfit);
+    //    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+    //}    
 
     int GetNumberOfNeutronFit_BC537s() { return fNeutronFit_BC537Vector.size(); }
     
@@ -77,7 +79,7 @@ public:
  
         TThread::Lock();
         int num = fCurrentSortMT;
-        std::cout << "tring to sort run " << fCurrentSortMT << std::endl;
+        //std::cout << "tring to sort run " << fCurrentSortMT << std::endl;
         if(fCurrentSortMT < (GetNumberOfNeutronFit_BC537s()-1)) fCurrentSortMT++;
         else fCurrentSortMT = 0;
         TThread::UnLock();
@@ -307,6 +309,7 @@ public:
     }    
 
     int fCurrentSortMT;
+    std::vector<TThread*> fThreadVector;
 
 };
 

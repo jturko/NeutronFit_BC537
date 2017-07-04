@@ -99,7 +99,13 @@ void Fitter::Draw()
 
 Fitter::Fitter() { InitializeParameters(); } 
 
-Fitter::~Fitter() {}
+Fitter::~Fitter() 
+{
+    for(int i=0; i<(int)fThreadVector.size(); i++) {
+        fThreadVector.at(i)->Delete();
+        delete fThreadVector.at(i);
+    }
+}
 
 Fitter::Fitter(int one)
 {
@@ -264,25 +270,35 @@ void Fitter::DrawToFile(std::string input)
 
 void Fitter::SortAllRunsMT() 
 {
-    std::vector<TThread*> tvec;
+    //std::vector<TThread*> tvec;
     //void * tmpargs = malloc(sizeof(MT_args));
 
-    if(GetNumberOfNeutronFit_BC537s() <= 10) {
+    if(GetNumberOfNeutronFit_BC537s() <= 20) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
             //MT_args tmpargs(this,i);
             
             //*((MT_args*)tmpargs) = MT_args(i,this);
             //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
             
-            tvec.at(i)->Run();
+            //tvec.at(i)->Run();
+            fThreadVector.at(i)->SetCancelOff();
+            fThreadVector.at(i)->Run();
+            std::cout << "state = " << fThreadVector.at(i)->GetState() << std::endl;
         }
     }
     else { std::cout << "more than 10 runs, not sorting!" << std::endl; }
     
+
     //for(int i=0; i<(int)tvec.size(); i++) delete tvec.at(i);
 
 }
+
+void Fitter::SetNextNeutronFit_BC537(int i) {
+    NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
+    SetNextNeutronFit_BC537(*hfit);
+    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
+} 
 
 vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
