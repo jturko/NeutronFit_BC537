@@ -27,3 +27,6 @@ Fitter.o: Fitter.cc $(HEADERS)
 
 clean:
 	rm -f *.o *.pcm FitterDict.cxx libFitter.so fit draw
+
+all:
+	make fit && make draw
