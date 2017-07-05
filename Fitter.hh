@@ -325,7 +325,7 @@ public:
     int fFinishedSortCountMT;
     std::vector<TThread*> fThreadVector;
     bool fRunMT;
-    void SetMT(bool val) {
+    void SetMT(bool val = true) {
         if(val == true) std::cout << "\n\t--->\tRUNNING MULTITHREADED" << std::endl;
         else            std::cout << "\n\t--->\tNOT RUNNING MULTITHREADED" << std::endl;; 
         fRunMT = val;

@@ -10,6 +10,9 @@ FITTERLIB = -L. -lFitter
 fit: fit.cc libFitter.so
 	$(CXX) $(CXXFLAGS) -o fit $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
 
+draw: draw.cc libFitter.so
+	$(CXX) $(CXXFLAGS) -o draw $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
+
 libFitter.so: FitterDict.cxx $(SOURCES)
 	g++ -shared -o $@ $(ROOTCONFIG) $(CXXFLAGS) $(ROOTLIBS) -I$(ROOTSYS)/include $^
 
