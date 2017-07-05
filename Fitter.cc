@@ -74,7 +74,7 @@ void Fitter::InitializeParameters()
     fSum2 = 0;
 
     fCurrentSortMT = 0;
-    fRunMT = true;
+    fRunMT = false;
 }
 
 void Fitter::Draw()
@@ -289,10 +289,9 @@ void Fitter::SortAllRunsMT()
                 tList.erase(std::remove(tList.begin(),tList.end(),tList.at(i)),tList.end());
             }
         }
-        TThread::Sleep(0,500);
+        TThread::Sleep(0,1e6);
     }    
-
-    
+    DoChi2();
 
     //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
     //    std::cout << "trying to join thread " << i << std::endl;

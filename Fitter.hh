@@ -326,6 +326,8 @@ public:
     std::vector<TThread*> fThreadVector;
     bool fRunMT;
     void SetMT(bool val) {
+        if(val == true) std::cout << "\n\t--->\tRUNNING MULTITHREADED" << std::endl;
+        else            std::cout << "\n\t--->\tNOT RUNNING MULTITHREADED" << std::endl;; 
         fRunMT = val;
     }
     bool GetMT() {
