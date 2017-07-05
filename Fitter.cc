@@ -275,11 +275,24 @@ void Fitter::SortAllRunsMT()
     //    thvec.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
     //    thvec.at(i)->Run();
     //}
-
+    
+    std::vector<TThread*> tList;
     for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-       fThreadVector.at(i)->Run();
+        fThreadVector.at(i)->Run();
+        tList.push_back(fThreadVector.at(i));
     }
     
+    while(int(tList.size())>0) {
+        for(int i=0; i<int(tList.size()); i++) {
+            if(tList.at(i)->GetState() == TThread::kCanceledState) {
+                tList.erase(std::remove(tList.begin(),tList.end(),tList.at(i)),tList.end());
+            }
+        }
+        TThread::Sleep(0,500);
+    }    
+
+    
+
     //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
     //    std::cout << "trying to join thread " << i << std::endl;
     //    fThreadVector.at(i)->Join();
@@ -295,7 +308,7 @@ void Fitter::SortAllRunsMT()
     //TThread::CleanUp();
 
     //TThread::Ps();
-    //TThread::Sleep(5,0);
+    //TThread::Sleep(10,0);
     //TThread::Ps();
 }
 

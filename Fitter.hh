@@ -19,6 +19,8 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <list>
+#include <algorithm>
 
 class Fitter;
 
@@ -205,7 +207,8 @@ public:
         for(int i=0; i<8; i++) mypar[i]=par[i];
         SetParameters(mypar);
         //if(DidParametersChange(mypar)) SortAllRuns();
-        SortAllRuns();
+        //SortAllRuns();
+        SortAllRunsMT();
         
         double val = DoChi2();
 

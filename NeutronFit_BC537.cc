@@ -229,7 +229,7 @@ void NeutronFit_BC537::Sort(double * par)
     
     int counter = 0;
     
-    std::cout << "starting run " << fRunNum << std::endl;
+    //std::cout << "starting run " << fRunNum << std::endl;
     for(int i=0; i<fSimSortMax; i++)
     {
         counter++;
@@ -299,7 +299,7 @@ void NeutronFit_BC537::Sort(double * par)
         }
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
-    std::cout << "finishing run " << fRunNum << std::endl;
+    //std::cout << "finishing run " << fRunNum << std::endl;
     
     //clock_t overalend = clock();
     //std::cout << "Overall time: " << (int)(overalend - overalstart) << std::endl;
