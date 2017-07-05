@@ -270,31 +270,33 @@ void Fitter::DrawToFile(std::string input)
 
 void Fitter::SortAllRunsMT() 
 {
-    TThread::SetCancelOff();
-    if(GetNumberOfNeutronFit_BC537s() <= 10) {
-        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            //fThreadVector.at(i)->SetCancelOff();
-            fThreadVector.at(i)->Run();
-            std::cout << "state = " << fThreadVector.at(i)->GetState() << std::endl;
-        }
-        //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-        //    std::cout << "trying to join thread " << i << std::endl;
-        //    fThreadVector.at(i)->Join();
-        //    std::cout << "done! " << i << std::endl;
-        //}
-        //while(fThreadVector.at(0)->Exists() > 1) {
-        //    //std::cout << "threads running = " << fThreadVector.at(0)->Exists() << " ... sleeping..." << std::endl;
-        //    TThread::Ps();
-        //    std::cout << std::endl;
-        //    TThread::Sleep(1,0);
-        //}
+        
+    //std::vector<TThread*> thvec;
+    //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+    //    thvec.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
+    //    thvec.at(i)->Run();
+    //}
+
+    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+       fThreadVector.at(i)->Run();
     }
-    else { std::cout << "more than 10 runs, not sorting!" << std::endl; }
     
-    TThread::CleanUp();
+    //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+    //    std::cout << "trying to join thread " << i << std::endl;
+    //    fThreadVector.at(i)->Join();
+    //    std::cout << "done! " << i << std::endl;
+    //}
+    //while(fThreadVector.at(0)->Exists() > 1) {
+    //    //std::cout << "threads running = " << fThreadVector.at(0)->Exists() << " ... sleeping..." << std::endl;
+    //    TThread::Ps();
+    //    std::cout << std::endl;
+    //    TThread::Sleep(1,0);
+    //}
+    
+    //TThread::CleanUp();
 
     //TThread::Ps();
-    //TThread::Sleep(20,0);
+    //TThread::Sleep(5,0);
     //TThread::Ps();
 }
 
@@ -302,7 +304,8 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
     NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
     SetNextNeutronFit_BC537(*hfit);
     //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
-    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
+    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
+    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
 } 
 
 vec Fitter::NelderMead(vec initial_vec, int itermax)

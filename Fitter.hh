@@ -83,8 +83,13 @@ public:
         if(fCurrentSortMT < (GetNumberOfNeutronFit_BC537s()-1)) fCurrentSortMT++;
         else fCurrentSortMT = 0;
         TThread::UnLock();
-        SortRun(num);
         
+        SortRun(num);
+
+        TThread::Lock();
+        fFinishedSortCountMT++;        
+        TThread::UnLock();
+
         //return 0;
         return;
     }

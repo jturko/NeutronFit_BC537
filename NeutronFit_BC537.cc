@@ -314,7 +314,7 @@ void NeutronFit_BC537::Sort(double * par)
 
     std::string title = std::to_string(fEnergy) + " MeV - Run " + std::to_string(fRunNum) + "; #chi^{2} = " + std::to_string(DoChi2());
     fExpHist->SetTitle(title.c_str());
-    
+   
     //if(fFitFunc) { delete fFitFunc; fFitFunc = NULL; }
     //fFitFunc = new TF1("fFitFunc",this,&NeutronFit_BC537::HistCompare,fCutoffLow,fCutoffHigh,8);
     //fFitFunc->SetNpx(100);
