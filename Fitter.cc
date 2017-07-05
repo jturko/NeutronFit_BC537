@@ -74,6 +74,7 @@ void Fitter::InitializeParameters()
     fSum2 = 0;
 
     fCurrentSortMT = 0;
+    fRunMT = true;
 }
 
 void Fitter::Draw()
@@ -359,7 +360,8 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     for(int i=0; i<int(nmvec.size()); i++) {
         std::cout << "simplex " << i+1 << std::endl;
         SetParameters(nmvec.at(i).par_array());         
-        SortAllRuns();
+        if(fRunMT == true) SortAllRunsMT();
+        else SortAllRuns();
         chi2vec.push_back(DoChi2());
     } 
     
@@ -496,7 +498,8 @@ vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon
 
 int Fitter::MinimizeGSL(std::string name)
 {
-    SortAllRuns();
+    if(fRunMT == true) SortAllRunsMT();
+    else SortAllRuns();
 
     ROOT::Math::GSLMinimizer * mini;
 
@@ -540,7 +543,8 @@ int Fitter::MinimizeGSL(std::string name)
 
 int Fitter::MinimizeSimAn()
 {
-    SortAllRuns();
+    if(fRunMT == true) SortAllRunsMT();
+    else SortAllRuns();
 
     ROOT::Math::GSLSimAnMinimizer mini;
 

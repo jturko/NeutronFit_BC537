@@ -193,12 +193,14 @@ public:
         
     double nm_val(double * par) {
         SetParameters(par);
-        SortAllRuns();
+        if(fRunMT == true) SortAllRunsMT();
+        else SortAllRuns();
         return DoChi2();
     }
     double nm_val(vec v) {
         SetParameters(v.par_array());
-        SortAllRuns();
+        if(fRunMT == true) SortAllRunsMT();
+        else SortAllRuns();
         return DoChi2();
     }
     
@@ -206,9 +208,8 @@ public:
         double mypar[8];
         for(int i=0; i<8; i++) mypar[i]=par[i];
         SetParameters(mypar);
-        //if(DidParametersChange(mypar)) SortAllRuns();
-        //SortAllRuns();
-        SortAllRunsMT();
+        if(fRunMT == true) SortAllRunsMT();
+        else SortAllRuns();
         
         double val = DoChi2();
 
@@ -222,8 +223,8 @@ public:
         mypar[6] = fParameters[6];
         mypar[7] = fParameters[7];
         SetParameters(mypar);
-        //if(DidParametersChange(mypar)) SortAllRuns();
-        SortAllRuns();
+        if(fRunMT == true) SortAllRunsMT();
+        else SortAllRuns();
         
         double val = DoChi2();
 
@@ -323,6 +324,13 @@ public:
     int fCurrentSortMT;
     int fFinishedSortCountMT;
     std::vector<TThread*> fThreadVector;
+    bool fRunMT;
+    void SetMT(bool val) {
+        fRunMT = val;
+    }
+    bool GetMT() {
+        return fRunMT;
+    } 
 
 };
 
