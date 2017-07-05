@@ -8,7 +8,9 @@
 #include "vec.hh"
 
 #include "TCanvas.h"
+
 #include "TThread.h"
+#include <pthread.h>
 
 #include "Math/GSLMinimizer.h"
 #include "Math/GSLSimAnMinimizer.h"
@@ -77,13 +79,15 @@ public:
         //std::cout << "run num = " << tmpArgs.GetRun() << std::endl;
         //SortRun(tmpArgs.sRun);
  
+        TThread::SetCancelOff();
+    
         TThread::Lock();
         int num = fCurrentSortMT;
         //std::cout << "tring to sort run " << fCurrentSortMT << std::endl;
         if(fCurrentSortMT < (GetNumberOfNeutronFit_BC537s()-1)) fCurrentSortMT++;
         else fCurrentSortMT = 0;
         TThread::UnLock();
-        
+     
         SortRun(num);
 
         TThread::Lock();

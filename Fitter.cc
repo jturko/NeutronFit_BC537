@@ -270,7 +270,6 @@ void Fitter::DrawToFile(std::string input)
 
 void Fitter::SortAllRunsMT() 
 {
-        
     //std::vector<TThread*> thvec;
     //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
     //    thvec.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
@@ -304,8 +303,8 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
     NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
     SetNextNeutronFit_BC537(*hfit);
     //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
-    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
-    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
+    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
+    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
 } 
 
 vec Fitter::NelderMead(vec initial_vec, int itermax)

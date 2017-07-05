@@ -13,6 +13,7 @@
 #include "TRandom3.h"
 
 #include "TThread.h"
+#include <pthread.h>
 
 #include "TMath.h"
 
