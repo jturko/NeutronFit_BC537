@@ -101,10 +101,10 @@ Fitter::Fitter() { InitializeParameters(); }
 
 Fitter::~Fitter() 
 {
-    for(int i=0; i<(int)fThreadVector.size(); i++) {
-        fThreadVector.at(i)->Delete();
-        delete fThreadVector.at(i);
-    }
+    //for(int i=0; i<(int)fThreadVector.size(); i++) {
+    //    fThreadVector.at(i)->Delete();
+    //    delete fThreadVector.at(i);
+    //}
 }
 
 Fitter::Fitter(int one)
@@ -270,33 +270,32 @@ void Fitter::DrawToFile(std::string input)
 
 void Fitter::SortAllRunsMT() 
 {
-    //std::vector<TThread*> tvec;
-    //void * tmpargs = malloc(sizeof(MT_args));
-
-    if(GetNumberOfNeutronFit_BC537s() <= 20) {
+    TThread::SetCancelOff();
+    if(GetNumberOfNeutronFit_BC537s() <= 10) {
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*) (void *))&Fitter::SortRunMT, (void*)this));
-            //MT_args tmpargs(this,i);
-            
-            //*((MT_args*)tmpargs) = MT_args(i,this);
-            //tvec.push_back(new TThread(Form("Thread_%d",i), (void(*)(void*))(&Fitter::SortRunMT), tmpargs));
-            
-            //tvec.at(i)->Run();
             //fThreadVector.at(i)->SetCancelOff();
             fThreadVector.at(i)->Run();
             std::cout << "state = " << fThreadVector.at(i)->GetState() << std::endl;
         }
-        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            std::cout << "trying to join thread " << i << std::endl;
-            fThreadVector.at(i)->Join();
-            std::cout << "done! " << i << std::endl;
-        }
+        //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+        //    std::cout << "trying to join thread " << i << std::endl;
+        //    fThreadVector.at(i)->Join();
+        //    std::cout << "done! " << i << std::endl;
+        //}
+        //while(fThreadVector.at(0)->Exists() > 1) {
+        //    //std::cout << "threads running = " << fThreadVector.at(0)->Exists() << " ... sleeping..." << std::endl;
+        //    TThread::Ps();
+        //    std::cout << std::endl;
+        //    TThread::Sleep(1,0);
+        //}
     }
     else { std::cout << "more than 10 runs, not sorting!" << std::endl; }
     
+    TThread::CleanUp();
 
-    //for(int i=0; i<(int)tvec.size(); i++) delete tvec.at(i);
-
+    //TThread::Ps();
+    //TThread::Sleep(20,0);
+    //TThread::Ps();
 }
 
 void Fitter::SetNextNeutronFit_BC537(int i) {

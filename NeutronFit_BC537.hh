@@ -12,6 +12,8 @@
 #include "TBranch.h"
 #include "TRandom3.h"
 
+#include "TThread.h"
+
 #include "TMath.h"
 
 #include "TFitResultPtr.h"
@@ -106,6 +108,7 @@ public:
     }
     
     double DoChi2() {
+        TThread::Lock();
         TH1F * h_e = (TH1F*)fExpHist->Clone();
         TH1F * h_s = (TH1F*)fSimHist->Clone();
         for(int i=h_e->FindBin(fCutoffHigh); i<h_e->GetNbinsX(); i++) h_e->SetBinContent(i,0.);
@@ -116,6 +119,7 @@ public:
         delete h_e;
         delete h_s;
 
+        TThread::UnLock();
         return fChi2;
     }
 

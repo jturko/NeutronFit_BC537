@@ -83,10 +83,10 @@ public:
         if(fCurrentSortMT < (GetNumberOfNeutronFit_BC537s()-1)) fCurrentSortMT++;
         else fCurrentSortMT = 0;
         TThread::UnLock();
-
         SortRun(num);
         
         //return 0;
+        return;
     }
     void SortAllRunsMT();
 
@@ -309,6 +309,7 @@ public:
     }    
 
     int fCurrentSortMT;
+    int fFinishedSortCountMT;
     std::vector<TThread*> fThreadVector;
 
 };

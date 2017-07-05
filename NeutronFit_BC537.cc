@@ -211,9 +211,13 @@ void NeutronFit_BC537::Sort(double * par)
     //PrintParameters();
     
     fExpBinNum = fExpHist->GetNbinsX();
+    
+    TThread::Lock();
     if(fSimHist) { delete fSimHist; fSimHist = NULL; }
     //fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,-10,5000); 
     fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,fExpBinLow,fExpBinHigh); 
+    TThread::UnLock();
+
     int nHits = 0;
     double light = 0.;
     double centroidEkin = 0.;    
@@ -225,6 +229,7 @@ void NeutronFit_BC537::Sort(double * par)
     
     int counter = 0;
     
+    std::cout << "starting run " << fRunNum << std::endl;
     for(int i=0; i<fSimSortMax; i++)
     {
         counter++;
@@ -288,10 +293,13 @@ void NeutronFit_BC537::Sort(double * par)
         }//end scatters loop
         if( (light+(fOffset/1000.)) > 0. && light > 0.) {
             light = 1000.*fRandom.Gaus(light+(fOffset/1000.),Resolution(light+(fOffset/1000.),fSmearingCoeff));
+            TThread::Lock();
             fSimHist->Fill(light);
+            TThread::UnLock();
         }
         //if(light>0.) fSimHist->Fill(light);
     }//end event loop
+    std::cout << "finishing run " << fRunNum << std::endl;
     
     //clock_t overalend = clock();
     //std::cout << "Overall time: " << (int)(overalend - overalstart) << std::endl;
