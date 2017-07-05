@@ -26,4 +26,4 @@ Fitter.o: Fitter.cc $(HEADERS)
 	$(CXX) $(CXXFLAGS) Fitter.cc $(ROOTCONFIG)                
 
 clean:
-	rm -f *.o *.pcm FitterDict.cxx libFitter.so fit
+	rm -f *.o *.pcm FitterDict.cxx libFitter.so fit draw
