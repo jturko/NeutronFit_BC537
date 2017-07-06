@@ -66,6 +66,12 @@ public:
         fOffset = offset;
     }
     double GetOffset() { return fOffset; }
+    
+    void SetSimSortMax(double val = -1) {
+        if(val < 0) fSimSortMax = fSimTree->GetEntries();
+        else fSimSortMax = val;
+    }
+    double GetSimSortMax() { return fSimSortMax; }
 
     void SetParameters(double * par);
     void Set5Parameters(double a1, double a2, double a3, double a4, double offset) {
