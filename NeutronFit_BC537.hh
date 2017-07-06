@@ -67,9 +67,10 @@ public:
     }
     double GetOffset() { return fOffset; }
     
-    void SetSimSortMax(double val = -1) {
-        if(val < 0) fSimSortMax = fSimTree->GetEntries();
+    void SetSimSortMax(int val = -1) {
+        if(val < 0 || val > fSimTree->GetEntries()) fSimSortMax = fSimTree->GetEntries();
         else fSimSortMax = val;
+        
     }
     int GetSimSortMax() { return fSimSortMax; }
 
