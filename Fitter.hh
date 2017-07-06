@@ -80,6 +80,24 @@ public:
         fNeutronFit_BC537Vector.at(i).Draw(); 
     }
     
+    void PrintSimSortMax() { 
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            std::cout << "Run# = " << fRunNumVector.at(i) << "\tSimSortMax = " << fNeutronFit_BC537Vector.at(i).GetSimSortMax() << std::endl;
+        }
+    }
+    void SetSimSortMax(double val = -1) { 
+        if(val < 0) {
+            for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+                fNeutronFit_BC537Vector.at(i).SetSimSortMax(fNeutronFit_BC537Vector.at(i).fSimTree->GetEntries());
+            }
+        }
+        else {
+            for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+                fNeutronFit_BC537Vector.at(i).SetSimSortMax(val);
+            }
+        }    
+    }
+
     void SortRunMT(void * ptr) {
         //MT_args tmpArgs = *((MT_args*)ptr);
         //std::cout << "run num = " << tmpArgs.GetRun() << std::endl;

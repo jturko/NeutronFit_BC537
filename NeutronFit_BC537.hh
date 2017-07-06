@@ -71,7 +71,7 @@ public:
         if(val < 0) fSimSortMax = fSimTree->GetEntries();
         else fSimSortMax = val;
     }
-    double GetSimSortMax() { return fSimSortMax; }
+    int GetSimSortMax() { return fSimSortMax; }
 
     void SetParameters(double * par);
     void Set5Parameters(double a1, double a2, double a3, double a4, double offset) {

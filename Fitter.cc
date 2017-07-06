@@ -328,14 +328,14 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
     std::cout << "starting Nelder Mead method... " << std::endl;
     
-    double inc0 = 0.01;   // a1
-    double inc1 = 0.01;  // a2
-    double inc2 = 0.01; // a3
-    double inc3 = 0.01;  // a4
-    double inc4 = 0.0001;  // carbon
-    double inc5 = 0.05; // A
-    double inc6 = 0.02; // B
-    double inc7 = 0.0005; // C
+    double inc0 = 0.1  ;  // a1
+    double inc1 = 0.5  ;  // a2
+    double inc2 = 0.1  ;  // a3
+    double inc3 = 0.1  ;  // a4
+    double inc4 = 0.01 ;   // carbon
+    double inc5 = 0.1  ;  // A
+    double inc6 = 0.1  ;  // B
+    double inc7 = 0.001;    // C
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
