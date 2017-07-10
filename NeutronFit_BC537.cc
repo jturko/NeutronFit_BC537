@@ -99,7 +99,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     std::string title = std::to_string(fEnergy) + " MeV";
     fExpHist = (TH1F*)(fExpFile->Get(hist_name.c_str())->Clone());
     fExpHist->SetNameTitle(hist_name.c_str(),title.c_str());
-    fExpHist->Scale(10000./fExpHist->Integral());
+    //fExpHist->Scale(10000./fExpHist->Integral());
     fExpHist->SetLineColor(kBlack);
     fExpHist->GetXaxis()->UnZoom(); 
     fExpHist->GetYaxis()->UnZoom();
