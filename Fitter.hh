@@ -298,6 +298,12 @@ public:
         }
     }
 
+    void NormalizeHistograms(double value = 1) {
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            fNeutronFit_BC537Vector.at(i).NormalizeHistograms(value);
+        }
+    }
+
     std::vector<NeutronFit_BC537> fNeutronFit_BC537Vector;   
     std::vector<int> fRunNumVector;
 
