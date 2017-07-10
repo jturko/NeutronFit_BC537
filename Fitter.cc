@@ -336,6 +336,7 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     double inc5 = 0.1  ;  // A
     double inc6 = 0.1  ;  // B
     double inc7 = 0.001;    // C
+    double inc8 = 0.5  ;    // offset
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
@@ -346,6 +347,7 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     vec v6(initial_vec); v6.set(5,v1.at(5)+inc5);
     vec v7(initial_vec); v7.set(6,v1.at(6)+inc6);
     vec v8(initial_vec); v8.set(7,v1.at(7)+inc7);
+    vec v9(initial_vec); v9.set(8,v1.at(8)+inc8);
 
     std::vector<vec> nmvec;
     nmvec.push_back(v0);
@@ -357,6 +359,7 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
     nmvec.push_back(v6);
     nmvec.push_back(v7);
     nmvec.push_back(v8);
+    nmvec.push_back(v9);
 
     std::cout << "calculating chi2's for the initial simplex..." << std::endl;
     std::vector<double> chi2vec;
@@ -487,15 +490,16 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         std::cout << std::endl;
     }
      
+    SetOffset(nmvec.at(0).at(8));
     Run(nmvec.at(0).at(0), nmvec.at(0).at(1), nmvec.at(0).at(2), nmvec.at(0).at(3), nmvec.at(0).at(4), nmvec.at(0).at(5), nmvec.at(0).at(6), nmvec.at(0).at(7));
     return nmvec.at(0);
 
    //////////////////////////////////////////////////////////////////
 }
 
-vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C, int itermax) 
+vec Fitter::NelderMead(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C, double offset, int itermax) 
 {
-    vec v(a1,a2,a3,a4,carbon,A,B,C);
+    vec v(a1,a2,a3,a4,carbon,A,B,C,offset);
     return NelderMead(v,itermax);
 }
 

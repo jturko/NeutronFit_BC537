@@ -199,7 +199,7 @@ public:
     //void NelderMead(int itermax = 50);
     //vec NelderMead(vec initial_vec, int itermax = 50);
     //void NelderMead3(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, int itermax=50);    
-    vec NelderMead(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.123, double B=0.125, double C=0.0074, int itermax=50);
+    vec NelderMead(double a1=0.639, double a2=1.462, double a3=0.373, double a4=0.968, double carbon=0, double A=0.123, double B=0.125, double C=0.0074, double offset = 4, int itermax=50);
     vec NelderMead(vec input, int itermax=50);
     
     double DoChi2() { 
@@ -215,12 +215,14 @@ public:
         
     double nm_val(double * par) {
         SetParameters(par);
+        SetOffset(par[8]);
         if(fRunMT == true) SortAllRunsMT();
         else SortAllRuns();
         return DoChi2();
     }
     double nm_val(vec v) {
         SetParameters(v.par_array());
+        SetOffset(v.at(8));
         if(fRunMT == true) SortAllRunsMT();
         else SortAllRuns();
         return DoChi2();
