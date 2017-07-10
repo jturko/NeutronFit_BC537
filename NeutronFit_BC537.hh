@@ -132,10 +132,7 @@ public:
     }
     void NormalizeHistograms(double value = 1) {
         if(fExpHist) fExpHist->Scale(value/fExpHist->Integral());
-        else std::cout << "No experimental histogram loaded (this should never happen)" << std::endl;
-        
         if(fSimHist) fSimHist->Scale(value/fSimHist->Integral());
-        else std::cout << "No simulated histogram sorted" << std::endl;
     }
 
 
