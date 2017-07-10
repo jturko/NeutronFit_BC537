@@ -278,9 +278,23 @@ public:
         }
     }
 
-    void LoadAll() {
-        for(int i=0; i<=63; i++) {
-            SetNextNeutronFit_BC537(i);
+    void LoadAll(bool energy_ordered = false) {
+        if(energy_ordered) {
+            double runs[64] = {
+                50  ,51  ,49  ,48  ,47  ,46  ,45  ,44  ,39  ,38  ,43  ,37  ,36  ,42  ,41  ,
+                0   ,40  ,35  ,1   ,26  ,27  ,2   ,28  ,3   ,29  ,30  ,22  ,23  ,11  ,31  ,
+                21  ,24  ,10  ,32  ,33  ,34  ,20  ,25  ,9   ,8   ,12  ,63  ,7   ,13  ,6   ,
+                62  ,5   ,14  ,4   ,61  ,15  ,60  ,16  ,17  ,18  ,59  ,19  ,58  ,57  ,56  ,
+                55  ,54  ,53  ,52  
+            };
+            for(int i=0; i<=63; i++) {
+                SetNextNeutronFit_BC537(runs[i]);
+            }   
+        }
+        else {
+            for(int i=0; i<=63; i++) {
+                SetNextNeutronFit_BC537(i);
+            }
         }
     }
 
