@@ -10,6 +10,9 @@ FITTERLIB = -L. -lFitter
 fit: fit.cc libFitter.so
 	$(CXX) $(CXXFLAGS) -o fit $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
 
+fitNM: fitNM.cc libFitter.so
+	$(CXX) $(CXXFLAGS) -o fitNM $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
+
 draw: draw.cc libFitter.so
 	$(CXX) $(CXXFLAGS) -o draw $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
 
@@ -26,4 +29,7 @@ Fitter.o: Fitter.cc $(HEADERS)
 	$(CXX) $(CXXFLAGS) Fitter.cc $(ROOTCONFIG)                
 
 clean:
-	rm -f *.o *.pcm FitterDict.cxx libFitter.so fit draw
+	rm -f *.o *.pcm FitterDict.cxx libFitter.so fit fitNM draw 
+
+all:
+	make fit && make fitNM && make draw

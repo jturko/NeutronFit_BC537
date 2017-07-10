@@ -277,27 +277,29 @@ void Fitter::SortAllRunsMT()
     //    thvec.at(i)->Run();
     //}
     
-    std::vector<TThread*> tList;
+    //std::vector<TThread*> tList;
     for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
         fThreadVector.at(i)->Run();
-        tList.push_back(fThreadVector.at(i));
+        //tList.push_back(fThreadVector.at(i));
     }
     
-    while(int(tList.size())>0) {
-        for(int i=0; i<int(tList.size()); i++) {
-            if(tList.at(i)->GetState() == TThread::kCanceledState) {
-                tList.erase(std::remove(tList.begin(),tList.end(),tList.at(i)),tList.end());
-            }
-        }
-        TThread::Sleep(0,1e6);
-    }    
-    DoChi2();
+    //while(int(tList.size())>0) {
+    //    std::cout << "completed " << (GetNumberOfNeutronFit_BC537s()-int(tList.size())) << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
+    //    for(int i=0; i<int(tList.size()); i++) {
+    //        if(tList.at(i)->GetState() == TThread::kCanceledState) {
+    //            tList.erase(std::remove(tList.begin(),tList.end(),tList.at(i)),tList.end());
+    //            std::cout << "completed " << (GetNumberOfNeutronFit_BC537s()-int(tList.size())) << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
+    //        }
+    //    }
+    //    TThread::Sleep(0,1e6);
+    //}    
+    //std::cout << std::flush << std::endl;
 
-    //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-    //    std::cout << "trying to join thread " << i << std::endl;
-    //    fThreadVector.at(i)->Join();
-    //    std::cout << "done! " << i << std::endl;
-    //}
+    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+        //std::cout << "trying to join thread " << i << std::endl;
+        fThreadVector.at(i)->Join();
+        //std::cout << "done! " << i << std::endl;
+    }
     //while(fThreadVector.at(0)->Exists() > 1) {
     //    //std::cout << "threads running = " << fThreadVector.at(0)->Exists() << " ... sleeping..." << std::endl;
     //    TThread::Ps();
@@ -310,6 +312,8 @@ void Fitter::SortAllRunsMT()
     //TThread::Ps();
     //TThread::Sleep(10,0);
     //TThread::Ps();
+    
+    DoChi2();
 }
 
 void Fitter::SetNextNeutronFit_BC537(int i) {
@@ -324,14 +328,14 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
     std::cout << "starting Nelder Mead method... " << std::endl;
     
-    double inc0 = 0.01;   // a1
-    double inc1 = 0.01;  // a2
-    double inc2 = 0.01; // a3
-    double inc3 = 0.01;  // a4
-    double inc4 = 0.0001;  // carbon
-    double inc5 = 0.05; // A
-    double inc6 = 0.02; // B
-    double inc7 = 0.0005; // C
+    double inc0 = 0.1  ;  // a1
+    double inc1 = 0.5  ;  // a2
+    double inc2 = 0.1  ;  // a3
+    double inc3 = 0.1  ;  // a4
+    double inc4 = 0.01 ;   // carbon
+    double inc5 = 0.1  ;  // A
+    double inc6 = 0.1  ;  // B
+    double inc7 = 0.001;    // C
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
