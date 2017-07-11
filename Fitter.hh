@@ -126,6 +126,17 @@ public:
     void SortRun(int num) { 
         if(Check(num)) { 
             fNeutronFit_BC537Vector.at(num).Sort(fParameters); 
+            if(fChi2Method == 1) {
+                std::string title = std::to_string(fNeutronFit_BC537Vector.at(num).GetEnergy()) + " MeV - Run " + std::to_string(fRunNumVector.at(num)) 
+                                  + "; #chi^{2} = " + std::to_string( fNeutronFit_BC537Vector.at(num).DoChi2()/fScalingFactorVector.at(num) );
+                fNeutronFit_BC537Vector.at(num).fExpHist->SetTitle(title.c_str());
+            }
+            else if(fChi2Method == 2) {
+                std::string title = std::to_string(fNeutronFit_BC537Vector.at(num).GetEnergy()) + " MeV - Run " + std::to_string(fRunNumVector.at(num)) 
+                                  + "; #chi^{2} = " + std::to_string( ((fNeutronFit_BC537Vector.at(num).DoChi2()-1.0)/fScalingFactorVector.at(num)) + 1.0 );
+                fNeutronFit_BC537Vector.at(num).fExpHist->SetTitle(title.c_str());
+            }
+            else { std::cout << "unknown fChi2Method! ( method = " << fChi2Method << " )" << std::endl; }
         }
         else{ std::cout << "out of bounds!" << std::endl;} 
     }
