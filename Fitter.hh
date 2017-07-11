@@ -140,7 +140,7 @@ public:
         DoChi2();
     }
    
-    void Print() { for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) std::cout << "Run# = " << fRunNumVector.at(num) << " ; Energy = " << fNeutronFit_BC537Vector.at(num).GetEnergy() << std::endl; } 
+    void Print() { for(int num=0; num<GetNumberOfNeutronFit_BC537s(); num++) std::cout << "Run# = " << fRunNumVector.at(num) << ";\t Energy = " << fNeutronFit_BC537Vector.at(num).GetEnergy() << ";\t Scaling Factor = " << double(fScalingFactorVector.at(num)) << ";\t ExpBinCounts = " << fNeutronFit_BC537Vector.at(num).GetExpCounts() << std::endl; } 
 
     void SetParameters(double a1, double a2, double a3, double a4, double carbon, double A, double B, double C) {
         fParameters[0]=a1;
@@ -205,11 +205,13 @@ public:
     double DoChi2() { 
         fSum = 0.;
         fSum2 = 0.;
-        for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
-        for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
-        fSum /= double(GetNumberOfNeutronFit_BC537s());
-        fSum2 /= double(GetNumberOfNeutronFit_BC537s());    
+        //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
+        //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
+        //fSum /= double(GetNumberOfNeutronFit_BC537s());
+        //fSum2 /= double(GetNumberOfNeutronFit_BC537s());    
     
+        // method 1
+
         return fSum; // CHANGE THIS TO SET WHAT WE WILL MINIMIZE [ chi2 or (chi2)^2 ]
     }
         
@@ -308,6 +310,8 @@ public:
 
     std::vector<NeutronFit_BC537> fNeutronFit_BC537Vector;   
     std::vector<int> fRunNumVector;
+    std::vector<double> fScalingFactorVector;
+    int fMinExpCounts;
 
     double fParameters[8];   
  

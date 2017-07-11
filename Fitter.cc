@@ -14,6 +14,8 @@ void Fitter::InitializeParameters()
     
     SetSmearingCoeff(0.130631,0.135853,1.20556e-6); 
    
+    fMinExpCounts = -1;
+
     fMinimizeCounter = 0;
  
     fNPar = 9;
@@ -110,6 +112,7 @@ Fitter::~Fitter()
 
 Fitter::Fitter(int one)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     InitializeParameters();
@@ -117,6 +120,7 @@ Fitter::Fitter(int one)
 
 Fitter::Fitter(int one, int two)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -125,6 +129,7 @@ Fitter::Fitter(int one, int two)
 
 Fitter::Fitter(int one, int two, int three)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -134,6 +139,7 @@ Fitter::Fitter(int one, int two, int three)
 
 Fitter::Fitter(int one, int two, int three, int four)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -144,6 +150,7 @@ Fitter::Fitter(int one, int two, int three, int four)
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -156,6 +163,7 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six)
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six, int seven, int eight)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -170,6 +178,7 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six, int seven, int eight, int nine, int ten)
 {
+    InitializeParameters();
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -319,9 +328,26 @@ void Fitter::SortAllRunsMT()
 void Fitter::SetNextNeutronFit_BC537(int i) {
     NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
     SetNextNeutronFit_BC537(*hfit);
+    
     //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
     fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
     //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
+    
+    //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " bins" << std::endl;
+    //std::cout << "the fMinExpCounts variable = " << fMinExpCounts << std::endl;
+    if(hfit->GetExpCounts() < fMinExpCounts || fMinExpCounts < 0) {
+        //std::cout << "old MinExpCounts = " << fMinExpCounts << std::endl;
+        fMinExpCounts = hfit->GetExpCounts();
+        //std::cout << "new MinExpCounts = " << fMinExpCounts << std::endl;
+        for(int i=0; i<int(fScalingFactorVector.size()); i++) {
+            fScalingFactorVector.at(i) = double(fNeutronFit_BC537Vector.at(i).GetExpCounts())/double(fMinExpCounts);
+        }
+        fScalingFactorVector.push_back(1.0000);       
+    }
+    else {
+        fScalingFactorVector.push_back(double(hfit->GetExpCounts())/double(fMinExpCounts));
+    }
+
 } 
 
 vec Fitter::NelderMead(vec initial_vec, int itermax)

@@ -167,6 +167,8 @@ public:
     TF1 * Fit();
     bool DidParametersChange(double * par);
 
+    double GetExpCounts() { return fExpHist->GetEntries(); }
+    
     TF1 * GetFitFunc() { return fFitFunc; }
 
     TF1 * fFitFunc;
