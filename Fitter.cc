@@ -15,7 +15,7 @@ void Fitter::InitializeParameters()
     SetSmearingCoeff(0.130631,0.135853,1.20556e-6); 
    
     fMinExpCounts = -1;
-    fChi2Method = 1;
+    fChi2Method = 2;
 
     fMinimizeCounter = 0;
  

@@ -241,11 +241,13 @@ public:
         std::cout << " total run chi2 = " << DoChi2() << std::endl;
 
         for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-            if(fChi2Method == 1) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy() 
-                                             << "\t Chi2 = " << ( fNeutronFit_BC537Vector.at(i).DoChi2() / fScalingFactorVector.at(i) ) << std::endl; 
+            if(fChi2Method == 1) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy() << " MeV" 
+                                             << "\t Chi2 = " << ( fNeutronFit_BC537Vector.at(i).DoChi2() / fScalingFactorVector.at(i) ) 
+                                             << "\t Scaling Factor = " << fScalingFactorVector.at(i) << std::endl; 
             }
-            else if(fChi2Method == 2) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy()
-                                             << "\t Chi2 = " << ( ((fNeutronFit_BC537Vector.at(i).DoChi2()-1.0)/fScalingFactorVector.at(i)) + 1.0 ) << std::endl;
+            else if(fChi2Method == 2) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy() << " MeV"
+                                             << "\t Chi2 = " << ( ((fNeutronFit_BC537Vector.at(i).DoChi2()-1.0)/fScalingFactorVector.at(i)) + 1.0 )
+                                             << "\t Scaling Factor = " << fScalingFactorVector.at(i) << std::endl; 
             }
         }
     }
@@ -356,6 +358,10 @@ public:
     //ofstream fOutStream;    
 
     int fChi2Method;
+    void SetChi2Method(int val = 2) {
+        fChi2Method = val;
+        std::cout << "chi2 method = " << fChi2Method << std::endl;
+    }
 
     double fSum;
     double fSum2;
