@@ -360,7 +360,7 @@ public:
     int fChi2Method;
     void SetChi2Method(int val = 2) {
         fChi2Method = val;
-        std::cout << "chi2 method = " << fChi2Method << std::endl;
+        std::cout << "\t--->>> chi2 method = " << fChi2Method << std::endl;
     }
 
     double fSum;
