@@ -15,6 +15,7 @@ void Fitter::InitializeParameters()
     SetSmearingCoeff(0.130631,0.135853,1.20556e-6); 
    
     fMinExpCounts = -1;
+    fChi2Method = 1;
 
     fMinimizeCounter = 0;
  
@@ -246,12 +247,13 @@ void Fitter::Run(double a1, double a2, double a3, double a4, double carbon, doub
         fNeutronFit_BC537Vector.at(i).Draw();
         gPad->Update();
     }
-    fSum = 0.;
-    fSum2 = 0.;
-    for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
-    for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
-    fSum /= double(GetNumberOfNeutronFit_BC537s());
-    fSum2 /= double(GetNumberOfNeutronFit_BC537s());
+    //fSum = 0.;
+    //fSum2 = 0.;
+    //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
+    //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
+    //fSum /= double(GetNumberOfNeutronFit_BC537s());
+    //fSum2 /= double(GetNumberOfNeutronFit_BC537s());
+    DoChi2();
     std::cout << "sum(chi2)/nfits = " << fSum << " | sum((chi2)^2)/nfits = " << fSum2 << std::endl;
 }
 

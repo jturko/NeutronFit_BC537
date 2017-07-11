@@ -205,14 +205,38 @@ public:
     double DoChi2() { 
         fSum = 0.;
         fSum2 = 0.;
+
+        // old method
         //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2();
         //for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum2 += fNeutronFit_BC537Vector.at(i).DoChi2() * fNeutronFit_BC537Vector.at(i).DoChi2();
         //fSum /= double(GetNumberOfNeutronFit_BC537s());
         //fSum2 /= double(GetNumberOfNeutronFit_BC537s());    
     
-        // method 1
-
+        if(fChi2Method == 1) { // method 1  --->>> chi2 / scaleFactor
+            for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += fNeutronFit_BC537Vector.at(i).DoChi2() / fScalingFactorVector.at(i);
+        }
+        else if(fChi2Method == 2) { // method 2  --->>> ((chi2 - 1) / scaleFactor) + 1
+            for(int i=0;i<GetNumberOfNeutronFit_BC537s();i++) fSum += ((fNeutronFit_BC537Vector.at(i).DoChi2()-1.0)/fScalingFactorVector.at(i)) + 1.0;
+        }
+        else { std::cout << "you must specify which chi2 method you would like to use! " << std::endl; return 0; }
+        
+        fSum /= double(GetNumberOfNeutronFit_BC537s());
         return fSum; // CHANGE THIS TO SET WHAT WE WILL MINIMIZE [ chi2 or (chi2)^2 ]
+    }
+    void PrintChi2() {
+        if(fChi2Method == 1 || fChi2Method == 2) { std::cout << "using chi2 method " << fChi2Method << std::endl; }
+        else { std::cout << "unknown chi2 method! ( method = " << fChi2Method << " )" << std::endl; return; }
+
+        std::cout << " total run chi2 = " << DoChi2() << std::endl;
+
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            if(fChi2Method == 1) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy() 
+                                             << "\t Chi2 = " << ( fNeutronFit_BC537Vector.at(i).DoChi2() / fScalingFactorVector.at(i) ) << std::endl; 
+            }
+            else if(fChi2Method == 2) { std::cout << " Run = " << fRunNumVector.at(i) << "\t Energy = " << fNeutronFit_BC537Vector.at(i).GetEnergy()
+                                             << "\t Chi2 = " << ( ((fNeutronFit_BC537Vector.at(i).DoChi2()-1.0)/fScalingFactorVector.at(i)) + 1.0 ) << std::endl;
+            }
+        }
     }
         
     double nm_val(double * par) {
@@ -319,6 +343,8 @@ public:
     
     int fMinimizeCounter;
     //ofstream fOutStream;    
+
+    int fChi2Method;
 
     double fSum;
     double fSum2;
