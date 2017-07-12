@@ -119,13 +119,16 @@ public:
         TThread::Lock();
         TH1F * h_e = (TH1F*)fExpHist->Clone();
         TH1F * h_s = (TH1F*)fSimHist->Clone();
-        for(int i=h_e->FindBin(fCutoffHigh); i<h_e->GetNbinsX(); i++) h_e->SetBinContent(i,0.);
-        for(int i=h_s->FindBin(fCutoffHigh); i<h_s->GetNbinsX(); i++) h_s->SetBinContent(i,0.);
-        for(int i=0; i<h_e->FindBin(fCutoffLow); i++) h_e->SetBinContent(i,0.);
-        for(int i=0; i<h_s->FindBin(fCutoffLow); i++) h_s->SetBinContent(i,0.);
+        int val = 0;
+        for(int i=h_e->FindBin(fCutoffHigh); i<h_e->GetNbinsX(); i++) h_e->SetBinContent(i,val);
+        for(int i=h_s->FindBin(fCutoffHigh); i<h_s->GetNbinsX(); i++) h_s->SetBinContent(i,val);
+        for(int i=0; i<h_e->FindBin(fCutoffLow); i++) h_e->SetBinContent(i,val);
+        for(int i=0; i<h_s->FindBin(fCutoffLow); i++) h_s->SetBinContent(i,val);
         fChi2 = h_e->Chi2Test(h_s,"CHI2/NDF");
         delete h_e;
         delete h_s;
+
+        if(fChi2 < 0) fChi2 = 1e20;
 
         TThread::UnLock();
         return fChi2;
