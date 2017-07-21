@@ -14,7 +14,6 @@ void Fitter::InitializeParameters()
     
     SetSmearingCoeff(0.130631,0.135853,1.20556e-6); 
    
-    fMinExpCounts = -1;
     fChi2Method = 2;
 
     fMinimizeCounter = 0;
@@ -70,6 +69,9 @@ void Fitter::InitializeParameters()
     SetSimAnLowOffset(0);
     SetSimAnStepOffset(1);
 
+    fUseSimAnStart = false;
+    fSimAnStartVec = NULL;
+
     fInloopmax = 10;
     fStartChi2 = 10;
 
@@ -113,7 +115,7 @@ Fitter::~Fitter()
 
 Fitter::Fitter(int one)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     InitializeParameters();
@@ -121,7 +123,7 @@ Fitter::Fitter(int one)
 
 Fitter::Fitter(int one, int two)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -130,7 +132,7 @@ Fitter::Fitter(int one, int two)
 
 Fitter::Fitter(int one, int two, int three)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -140,7 +142,7 @@ Fitter::Fitter(int one, int two, int three)
 
 Fitter::Fitter(int one, int two, int three, int four)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -151,7 +153,7 @@ Fitter::Fitter(int one, int two, int three, int four)
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -164,7 +166,7 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six)
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six, int seven, int eight)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -179,7 +181,7 @@ Fitter::Fitter(int one, int two, int three, int four, int five, int six, int sev
 
 Fitter::Fitter(int one, int two, int three, int four, int five, int six, int seven, int eight, int nine, int ten)
 {
-    InitializeParameters();
+    fMinExpCounts = -1;
     fCanvas = NULL;
     SetNextNeutronFit_BC537(one);
     SetNextNeutronFit_BC537(two);
@@ -338,9 +340,9 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
     //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " bins" << std::endl;
     //std::cout << "the fMinExpCounts variable = " << fMinExpCounts << std::endl;
     if(hfit->GetExpCounts() < fMinExpCounts || fMinExpCounts < 0) {
-        //std::cout << "old MinExpCounts = " << fMinExpCounts << std::endl;
+        std::cout << "old MinExpCounts = " << fMinExpCounts;
         fMinExpCounts = hfit->GetExpCounts();
-        //std::cout << "new MinExpCounts = " << fMinExpCounts << std::endl;
+        std::cout << "\tnew MinExpCounts = " << fMinExpCounts << std::endl;
         for(int i=0; i<int(fScalingFactorVector.size()); i++) {
             fScalingFactorVector.at(i) = double(fNeutronFit_BC537Vector.at(i).GetExpCounts())/double(fMinExpCounts);
         }
@@ -356,15 +358,15 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
 {
     std::cout << "starting Nelder Mead method... " << std::endl;
     
-    double inc0 = 0.1  ;  // a1
-    double inc1 = 0.5  ;  // a2
-    double inc2 = 0.1  ;  // a3
-    double inc3 = 0.1  ;  // a4
-    double inc4 = 0.01 ;   // carbon
-    double inc5 = 0.1  ;  // A
-    double inc6 = 0.1  ;  // B
-    double inc7 = 0.001;    // C
-    double inc8 = 0.5  ;    // offset
+    double inc0 = 0.01  ;  // a1
+    double inc1 = 0.02  ;  // a2
+    double inc2 = 0.01  ;  // a3
+    double inc3 = 0.01  ;  // a4
+    double inc4 = 0.0001 ;   // carbon
+    double inc5 = 0.01  ;  // A
+    double inc6 = 0.01  ;  // B
+    double inc7 = 0.0001;    // C
+    double inc8 = 0.25  ;    // offset
 
     vec v0(initial_vec);
     vec v1(initial_vec); v1.set(0,v1.at(0)+inc0);
@@ -398,6 +400,7 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         else SortAllRuns();
         chi2vec.push_back(DoChi2());
     } 
+    PrintChi2();     
     
     int nmvec_size = int(nmvec.size());
         
@@ -486,7 +489,8 @@ vec Fitter::NelderMead(vec initial_vec, int itermax)
         nmvec.at(nmvec_size-1) = W; chi2vec.at(nmvec_size-1) = W_chi2;
     
         std::cout << std::endl << "finished iteration # " << iter << "/" << itermax << std::endl << std::endl;
-        
+        PrintChi2();     
+   
         // end of logical loop
     }
 
@@ -708,25 +712,54 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     std::cout << std::fixed << std::setprecision(3);
 
     //  generate x(0) - the initial random solution
-    bool badStart = true;
-    std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
-    std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
-    while(badStart) {
-        fRandom.RndmArray(nPar,old_soln);
-        for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
-        for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
-        old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
-        if(old_chi2 < fStartChi2) {
-            std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
-            badStart = false;
-        }
-        else {
-            std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
-        }
+    //bool badStart = true;
+    //std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
+    //std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
+    //while(badStart) {
+    //    fRandom.RndmArray(nPar,old_soln);
+    //    for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+    //    for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
+    //    old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+    //    if(old_chi2 < fStartChi2) {
+    //        std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+    //        badStart = false;
+    //    }
+    //    else {
+    //        std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
+    //    }
    
-    }    
-    
-     
+    //}    
+
+    if(fUseSimAnStart) {
+        std::cout << "\t--->>> Using SimAnStart:\n";
+        std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl << "\t";
+        for(int i=0; i<nPar; i++) { 
+            old_soln[i] = fSimAnStartVec->at(i);
+            std::cout << old_soln[i] << "\t";
+        }
+        old_chi2 = FitValue((const double *)old_soln);
+        std::cout << "chi2 = " << old_chi2 << std::endl;
+    }
+    else {
+        //  generate x(0) - the initial random solution
+        bool badStart = true;
+        std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
+        std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC" << std::endl;
+        while(badStart) {
+            fRandom.RndmArray(nPar,old_soln);
+            for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+            for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
+            old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+            if(old_chi2 < fStartChi2) {
+                std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+                badStart = false;
+            }
+            else {
+                std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
+            }
+        }    
+    }
+ 
     std::cout << std::fixed << std::setprecision(3);
     std::cout << std::endl;
     std::cout << "\tT_i = " << T_0 << " \tT_f = " << T_min << " \talpha = " << alpha << " \t# of iterations = " << (int(itermax)+1) << " \t# of sub-iterations / T = " << fInloopmax << std::endl;
@@ -1055,26 +1088,37 @@ int Fitter::MyMinimizeSimAn9(double alpha, double T_0, double T_min)
     std::cout << std::endl;
     std::cout << std::fixed << std::setprecision(3);
 
-    //  generate x(0) - the initial random solution
-    bool badStart = true;
-    std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
-    std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC\tOffset" << std::endl;
-    while(badStart) {
-        fRandom.RndmArray(nPar,old_soln);
-        for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
-        for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
+    if(fUseSimAnStart) {
+        std::cout << "\t--->>> Using SimAnStart:\n";
+        std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC\tOffset" << std::endl << "\t";
+        for(int i=0; i<nPar; i++) { 
+            old_soln[i] = fSimAnStartVec->at(i);
+            std::cout << old_soln[i] << "\t";
+        }
         SetOffset(old_soln[8]);
-        old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
-        if(old_chi2 < fStartChi2) {
-            std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
-            badStart = false;
-        }
-        else {
-            std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
-        }
-   
-    }    
-    
+        old_chi2 = FitValue((const double *)old_soln);
+        std::cout << "chi2 = " << old_chi2 << std::endl;
+    }
+    else {
+        //  generate x(0) - the initial random solution
+        bool badStart = true;
+        std::cout << "\t--->>> Looking for a start w/ chi2 < " << fStartChi2 << std::endl << std::endl;
+        std::cout << "\ta1\ta2\ta3\ta4\t12C\tA\tB\tC\tOffset" << std::endl;
+        while(badStart) {
+            fRandom.RndmArray(nPar,old_soln);
+            for(int i=0; i<nPar; i++) old_soln[i] = fXlow[i] + old_soln[i]*(fXhigh[i]-fXlow[i]);
+            for(int i=0; i<nPar; i++) std::cout << "\t" << old_soln[i];
+            SetOffset(old_soln[8]);
+            old_chi2 = FitValue((const double *)old_soln); // evaluate initial guess x(0) chi2
+            if(old_chi2 < fStartChi2) {
+                std::cout << " \tgood start! chi2 = " << old_chi2 << std::endl;
+                badStart = false;
+            }
+            else {
+                std::cout << " \tbad start! chi2 = " << old_chi2 << std::endl;
+            }
+        }    
+    }
      
     std::cout << std::fixed << std::setprecision(3);
     std::cout << std::endl;
