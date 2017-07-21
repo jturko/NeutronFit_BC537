@@ -411,6 +411,13 @@ public:
     int GetInLoopMax() {
         return fInloopmax;
     }    
+    
+    void SetSimAnStart(double a1, double a2, double a3, double a4, double C12, double A, double B, double C, double offset) {
+        fUseSimAnStart = true;
+        fSimAnStartVec = new vec(a1,a2,a3,a4,C12,A,B,C,offset);    
+    }
+    bool fUseSimAnStart;
+    vec * fSimAnStartVec;
 
     int fCurrentSortMT;
     int fFinishedSortCountMT;
