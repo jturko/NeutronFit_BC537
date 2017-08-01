@@ -308,6 +308,7 @@ public:
  
 
     void DrawToFile(std::string name);
+    void WriteToFile(std::string name);
 
     bool GetUsePolyLightYield() { 
         if(GetNumberOfNeutronFit_BC537s() != 0) return fNeutronFit_BC537Vector.at(0).GetUsePolyLightYield();

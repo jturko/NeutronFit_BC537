@@ -282,6 +282,21 @@ void Fitter::DrawToFile(std::string input)
 
 }
 
+void Fitter::WriteToFile(std::string name)
+{   
+    std::string rootfile = ".root";
+    if(name.length() <= 5 || name.compare(name.length()-5,5,rootfile) != 0) name += ".root";
+    TFile * f = TFile::Open(name.c_str(),"RECREATE");
+ 
+    std::cout << "writing all simulated histograms to " << name << " ...";
+    f->cd();
+    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+        fNeutronFit_BC537Vector.at(i).fSimHist->Write(Form("Sim%d",fRunNumVector.at(i)));       
+    }          
+    f->Close();
+    std::cout << " done! " << std::endl;
+}
+
 void Fitter::SortAllRunsMT() 
 {
     //std::vector<TThread*> thvec;
