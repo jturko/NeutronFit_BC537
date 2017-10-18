@@ -37,6 +37,8 @@ public:
     NeutronFit_BC537(int run_num=0);
     ~NeutronFit_BC537();
 
+    void BuildEventTree();
+
     void PrintParameters() {
         std::cout << "     a1 = " << fParameters[0] << std::endl;
         std::cout << "     a2 = " << fParameters[1] << std::endl;
@@ -174,6 +176,13 @@ public:
     
     TF1 * GetFitFunc() { return fFitFunc; }
 
+    void GetEntry(int i) {
+        fEdepBranch->GetEntry(i);
+        fEkinBranch->GetEntry(i);
+        fPtypeBranch->GetEntry(i);
+        fTimingBranch->GetEntry(i);
+    }
+
     TF1 * fFitFunc;
 
     double fEnergy;
@@ -197,6 +206,17 @@ public:
     std::vector<double> * fEkinVector;
     std::vector<int> * fPtypeVector;
     std::vector<double> * fTimingVector;
+
+    TTree * fEventTree;
+    int fNumEvents;
+    double fEventTimeWindow;
+    double GetEventTimeWindow() {
+        return fEventTimeWindow;
+    }
+    void SetEventTimeWindow(double time) {
+        fEventTimeWindow = time;
+    }
+    
 
     double fProtonCoeff[4];
     double fDeuteronCoeff[4];

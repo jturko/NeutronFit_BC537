@@ -17,6 +17,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fEkinVector(NULL),
     fPtypeVector(NULL),
     fTimingVector(NULL),
+    fEventTree(NULL),
     fRebin(false)
 {
     
@@ -167,6 +168,9 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
 
     fUsePolyLightYield = false;
 
+    fEventTimeWindow = 200.; // this should be in nanoseconds
+    BuildEventTree();
+
 }
 
 NeutronFit_BC537::~NeutronFit_BC537() {}
@@ -243,6 +247,7 @@ void NeutronFit_BC537::Sort(double * par)
         fEdepBranch->GetEntry(i);   
         fEkinBranch->GetEntry(i);   
         fPtypeBranch->GetEntry(i);   
+        fTimingBranch->GetEntry(i);
         nHits = fEdepVector->size();
         light = 0.;
         for(int j=0; j<nHits; j++)
@@ -365,4 +370,32 @@ bool NeutronFit_BC537::DidParametersChange(double * par)
     return false;
 }
 
+void NeutronFit_BC537::BuildEventTree()
+{
+    std::cout << "\t Building event tree ... \n";
 
+    if(fEventTree) { 
+        delete fEventTree;
+        fEventTree = NULL;
+    }
+    fEventTree = new TTree();
+    fNumEvents = 0;
+
+    std::cout << " \t\t fSimTree entries = " << fNumEntries << std::endl;    
+    double delta, t1, t2, tmp;
+    int vSize;
+    for(int i=0; i<fNumEntries; i++) {
+        GetEntry(i);
+        vSize = (int)fTimingVector->size();
+        delta = 0;
+        for(int j=0; j<vSize-1; j++) {
+            t1 = fTimingVector->at(j);
+            t2 = fTimingVector->at(j+1);
+            tmp = TMath::Abs(t1-t2);
+            if(delta < tmp) delta = tmp;
+        }
+        std::cout << "biggest delta for event " << i << " = " << delta << " ns (vSize = " << vSize << ") \n";
+    }
+
+    std::cout << "\t Done!\n";
+}
