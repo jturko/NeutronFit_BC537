@@ -1,9 +1,9 @@
 
-void FitResolution() 
+void FitResolution(int proton = 1) 
 {
 
     TFile * file = TFile::Open("~/data/hists2012.root");
-    TGraphErrors * res = (TGraphErrors*)file->Get("NeutronResolution1");
+    TGraphErrors * res = (TGraphErrors*)file->Get(Form("NeutronResolution%d",proton));
     double xx,yy,dx,dy;
     for(int i=0; i<res->GetN(); i++) {
         res->GetPoint(i,xx,yy);
@@ -13,6 +13,9 @@ void FitResolution()
         res->SetPointError(i,dx/1000.,dy/100.);
     }
 
+    res->SetMarkerStyle(24);
+    res->SetMarkerSize(1);
+
     TF1 * func = new TF1("func","TMath::Sqrt([0]*[0] + [1]*[1]/x + [2]*[2]/x/x)",0.0001,5);
     func->SetParameters(0.1,0.1,0.001);
     func->SetParLimits(0,0,1);
@@ -21,5 +24,5 @@ void FitResolution()
     func->SetNpx(1000);
     res->Fit(func);
 
-    res->Draw("a*");
+    res->Draw("a p");
 }
