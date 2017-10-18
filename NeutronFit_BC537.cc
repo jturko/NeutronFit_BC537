@@ -384,9 +384,11 @@ void NeutronFit_BC537::BuildEventTree()
     std::cout << " \t\t fSimTree entries = " << fNumEntries << std::endl;    
     double delta, t1, t2, tmp;
     int vSize;
+    int badEvents = 0;
     for(int i=0; i<fNumEntries; i++) {
         GetEntry(i);
         vSize = (int)fTimingVector->size();
+        if(vSize == 1) continue;
         delta = 0;
         for(int j=0; j<vSize-1; j++) {
             t1 = fTimingVector->at(j);
@@ -394,8 +396,12 @@ void NeutronFit_BC537::BuildEventTree()
             tmp = TMath::Abs(t1-t2);
             if(delta < tmp) delta = tmp;
         }
-        std::cout << "biggest delta for event " << i << " = " << delta << " ns (vSize = " << vSize << ") \n";
+        if(delta > fEventTimeWindow) {
+            //std::cout << "\t\t biggest delta for event " << i << " = " << delta << " ns (vSize = " << vSize << ") \n";
+            badEvents++;
+        }
     }
+    std::cout << "\t\t we need to correct " << badEvents << "/" << fNumEntries << " events (" << double(badEvents)/double(fNumEntries)*100. << "%)\n";
 
     std::cout << "\t Done!\n";
 }
