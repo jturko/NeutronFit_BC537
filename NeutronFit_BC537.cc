@@ -12,9 +12,11 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fEdepBranch(NULL),
     fEkinBranch(NULL),
     fPtypeBranch(NULL),
+    fTimingBranch(NULL),
     fEdepVector(NULL),
     fEkinVector(NULL),
     fPtypeVector(NULL),
+    fTimingVector(NULL),
     fRebin(false)
 {
     
@@ -114,7 +116,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
         if(fExpHist->GetBinContent(i)<0.) fExpHist->SetBinContent(i,0.);
     }    
 
-    std::string name = "~/data/smearing/deuteron/G4_RAW/Sim" + std::to_string(fRunNum) + "/g4out.root";
+    std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());     
 
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
@@ -123,6 +125,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
     fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
     fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
+    fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
     
     fProtonCoeff[0] = 0.74; fProtonCoeff[1] = 3.2; fProtonCoeff[2] = 0.20; fProtonCoeff[3] = 0.97;
     fDeuteronCoeff[0] = 0.75; fDeuteronCoeff[1] = 2.80; fDeuteronCoeff[2] = 0.25; fDeuteronCoeff[3] = 0.93;

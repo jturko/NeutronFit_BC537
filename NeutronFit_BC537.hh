@@ -192,9 +192,11 @@ public:
     TBranch * fEdepBranch;
     TBranch * fEkinBranch;
     TBranch * fPtypeBranch;
+    TBranch * fTimingBranch;
     std::vector<double> * fEdepVector;
     std::vector<double> * fEkinVector;
     std::vector<int> * fPtypeVector;
+    std::vector<double> * fTimingVector;
 
     double fProtonCoeff[4];
     double fDeuteronCoeff[4];
