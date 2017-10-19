@@ -387,20 +387,21 @@ void NeutronFit_BC537::BuildEventTree()
         vSize = (int)fTimingVector->size();
         if(vSize == 1) continue;
  
-        double t1, t2, delta, tmp;
-        delta = 0;
+        //double t1, t2, delta, tmp;
+        //delta = 0;
 
-        if(i<1000 && vSize > 5) {
-            std::cout << "before sorting...\n";
-            for(int j=vSize-1; j>0; j--) {
-                t1 = fTimingVector->at(j); 
-                t2 = fTimingVector->at(j-1);
-                //tmp = TMath::Abs(t1-t2);
-                tmp = t1-t2;
-                std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
-                if(delta < tmp) delta = tmp;
-            }
-        }
+        //if(i<1000 && vSize > 5) {
+        //    std::cout << "before sorting...\n";
+        //    for(int j=vSize-1; j>0; j--) {
+        //        t1 = fTimingVector->at(j); 
+        //        t2 = fTimingVector->at(j-1);
+        //        //tmp = TMath::Abs(t1-t2);
+        //        tmp = t1-t2;
+        //        std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
+        //        if(delta < tmp) delta = tmp;
+        //    }
+        //}
+        
         std::vector<std::pair<size_t,std::vector<double>::const_iterator>> order(fTimingVector->size());
         size_t n = 0;
         for(std::vector<double>::const_iterator it = fTimingVector->begin(); it != fTimingVector->end(); it++, n++) {
@@ -416,18 +417,19 @@ void NeutronFit_BC537::BuildEventTree()
         *fEkinVector = sort_from_ref(*fEkinVector,order);
         *fPtypeVector = sort_from_ref(*fPtypeVector,order);
         *fTimingVector = sort_from_ref(*fTimingVector,order);
-        if(i<1000 && vSize > 5) {
-            std::cout << "after sorting...\n";
-            for(int j=vSize-1; j>0; j--) {
-                t1 = fTimingVector->at(j); 
-                t2 = fTimingVector->at(j-1);
-                //tmp = TMath::Abs(t1-t2);
-                tmp = t1-t2;
-                std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
-                if(delta < tmp) delta = tmp;
-            }
-            std::cout << "\n\n\n";
-        }
+        
+        //if(i<1000 && vSize > 5) {
+        //    std::cout << "after sorting...\n";
+        //    for(int j=vSize-1; j>0; j--) {
+        //        t1 = fTimingVector->at(j); 
+        //        t2 = fTimingVector->at(j-1);
+        //        //tmp = TMath::Abs(t1-t2);
+        //        tmp = t1-t2;
+        //        std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
+        //        if(delta < tmp) delta = tmp;
+        //    }
+        //    std::cout << "\n\n\n";
+        //}
 
         // FIGURE THIS OUT LATER
         //auto p = sort_permutation(fTimingVector, 
