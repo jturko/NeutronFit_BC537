@@ -208,6 +208,7 @@ public:
     std::vector<double> * fTimingVector;
 
     TTree * fEventTree;
+    TTree * fLongEventTree;
     int fNumEvents;
     double fEventTimeWindow;
     double GetEventTimeWindow() {

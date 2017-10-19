@@ -18,6 +18,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fPtypeVector(NULL),
     fTimingVector(NULL),
     fEventTree(NULL),
+    fLongEventTree(NULL),
     fRebin(false)
 {
     
@@ -378,30 +379,34 @@ void NeutronFit_BC537::BuildEventTree()
         delete fEventTree;
         fEventTree = NULL;
     }
+    if(fLongEventTree) { 
+        delete fLongEventTree;
+        fLongEventTree = NULL;
+    }
+    std::vector<double> ekin;
+    std::vector<double> edep;
+    std::vector<int> ptype;
+    std::vector<double> time;
+    
     fEventTree = new TTree();
+    fEventTree->Branch("ekin",&ekin);
+    fEventTree->Branch("edep",&edep);
+    fEventTree->Branch("ptype",&ptype);
+    fEventTree->Branch("time",&time);
     fNumEvents = 0;
+    
+    fLongEventTree = new TTree();
+    fLongEventTree->Branch("ekin",&ekin);
+    fLongEventTree->Branch("edep",&edep);
+    fLongEventTree->Branch("ptype",&ptype);
+    fLongEventTree->Branch("time",&time);
 
     int vSize;
     for(int i=0; i<fNumEntries; i++) {
         GetEntry(i);
         vSize = (int)fTimingVector->size();
-        if(vSize == 1) continue;
+        //if(vSize == 1) continue;
  
-        //double t1, t2, delta, tmp;
-        //delta = 0;
-
-        //if(i<1000 && vSize > 5) {
-        //    std::cout << "before sorting...\n";
-        //    for(int j=vSize-1; j>0; j--) {
-        //        t1 = fTimingVector->at(j); 
-        //        t2 = fTimingVector->at(j-1);
-        //        //tmp = TMath::Abs(t1-t2);
-        //        tmp = t1-t2;
-        //        std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
-        //        if(delta < tmp) delta = tmp;
-        //    }
-        //}
-        
         std::vector<std::pair<size_t,std::vector<double>::const_iterator>> order(fTimingVector->size());
         size_t n = 0;
         for(std::vector<double>::const_iterator it = fTimingVector->begin(); it != fTimingVector->end(); it++, n++) {
@@ -417,24 +422,47 @@ void NeutronFit_BC537::BuildEventTree()
         *fEkinVector = sort_from_ref(*fEkinVector,order);
         *fPtypeVector = sort_from_ref(*fPtypeVector,order);
         *fTimingVector = sort_from_ref(*fTimingVector,order);
+  
+        double t0 = fTimingVector->at(0); // time of the first interaction
+        double t = 0;
+        double delta = 0;
+        ekin.clear();
+        edep.clear();
+        ptype.clear();
+        time.clear();
+        ekin.push_back(fEkinVector->at(0));
+        edep.push_back(fEdepVector->at(0));
+        ptype.push_back(fPtypeVector->at(0));
+        time.push_back(fTimingVector->at(0));
         
-        //if(i<1000 && vSize > 5) {
-        //    std::cout << "after sorting...\n";
-        //    for(int j=vSize-1; j>0; j--) {
-        //        t1 = fTimingVector->at(j); 
-        //        t2 = fTimingVector->at(j-1);
-        //        //tmp = TMath::Abs(t1-t2);
-        //        tmp = t1-t2;
-        //        std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
-        //        if(delta < tmp) delta = tmp;
-        //    }
-        //    std::cout << "\n\n\n";
-        //}
-
-        // FIGURE THIS OUT LATER
-        //auto p = sort_permutation(fTimingVector, 
-        //    [](double const& a, double const& b) { if(a>b) return a > b; });
-            
+        bool longEvent = false;
+        for(int j=1; j<vSize; j++) {
+            t = fTimingVector->at(j);
+            delta = t - t0;
+            if(delta > fEventTimeWindow) {
+                fEventTree->Fill();
+                if(longEvent) fLongEventTree->Fill();
+                longEvent = true;
+                ekin.clear();
+                edep.clear();
+                ptype.clear();
+                time.clear();
+                t0 = t;   
+            }
+            ekin.push_back(fEkinVector->at(j));
+            edep.push_back(fEdepVector->at(j));
+            ptype.push_back(fPtypeVector->at(j));
+            time.push_back(fTimingVector->at(j));
+        }
+        fEventTree->Fill();
+        if(longEvent) fLongEventTree->Fill();
     }
+    //fEventTree->Write();   
+    fNumEvents = fEventTree->GetEntries();
+    std::cout << " done!\n" << std::flush;
 
+    TFile * outfile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
+    fEventTree->Write("EventTree");
+    fLongEventTree->Write("LongEventTree");
+    outfile->Close();     
 }
