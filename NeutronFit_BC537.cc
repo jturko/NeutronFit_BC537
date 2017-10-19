@@ -372,7 +372,7 @@ bool NeutronFit_BC537::DidParametersChange(double * par)
 
 void NeutronFit_BC537::BuildEventTree()
 {
-    std::cout << "\t Building event tree ... \n";
+    std::cout << "\t Building event tree ... " << std::flush;
 
     if(fEventTree) { 
         delete fEventTree;
@@ -381,28 +381,58 @@ void NeutronFit_BC537::BuildEventTree()
     fEventTree = new TTree();
     fNumEvents = 0;
 
-    double delta, t1, t2, tmp;
     int vSize;
-    int badEvents = 0;
     for(int i=0; i<fNumEntries; i++) {
         GetEntry(i);
         vSize = (int)fTimingVector->size();
         if(vSize == 1) continue;
+ 
+        double t1, t2, delta, tmp;
         delta = 0;
-        std::cout << "\t\t checking event " << i << std::endl;
-        for(int j=vSize-1; j>0; j--) {
-            t1 = fTimingVector->at(j); 
-            t2 = fTimingVector->at(j-1);
-            tmp = TMath::Abs(t1-t2);
-            std::cout << "\t\t\t t1 = " << t1 << " t2 = " << t2 << std::endl;
-            if(delta < tmp) delta = tmp;
-        }
-        if(delta > fEventTimeWindow) {
-            //std::cout << "\t\t biggest delta for event " << i << " = " << delta << " ns (vSize = " << vSize << ") \n";
-            badEvents++;
-        }
-    }
-    std::cout << "\t\t we need to correct " << badEvents << "/" << fNumEntries << " events (" << double(badEvents)/double(fNumEntries)*100. << "%)\n";
 
-    std::cout << "\t Done!\n";
+        if(i<1000 && vSize > 5) {
+            std::cout << "before sorting...\n";
+            for(int j=vSize-1; j>0; j--) {
+                t1 = fTimingVector->at(j); 
+                t2 = fTimingVector->at(j-1);
+                //tmp = TMath::Abs(t1-t2);
+                tmp = t1-t2;
+                std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
+                if(delta < tmp) delta = tmp;
+            }
+        }
+        std::vector<std::pair<size_t,std::vector<double>::const_iterator>> order(fTimingVector->size());
+        size_t n = 0;
+        for(std::vector<double>::const_iterator it = fTimingVector->begin(); it != fTimingVector->end(); it++, n++) {
+            order[n] = std::make_pair(n,it);
+        }
+        struct ordering {
+            bool operator ()(std::pair<size_t, std::vector<double>::const_iterator> const& a, std::pair<size_t, std::vector<double>::const_iterator> const& b) {
+                return *(a.second) < *(b.second);
+            }
+        };
+        std::sort(order.begin(), order.end(), ordering());
+        *fEdepVector = sort_from_ref(*fEdepVector,order);
+        *fEkinVector = sort_from_ref(*fEkinVector,order);
+        *fPtypeVector = sort_from_ref(*fPtypeVector,order);
+        *fTimingVector = sort_from_ref(*fTimingVector,order);
+        if(i<1000 && vSize > 5) {
+            std::cout << "after sorting...\n";
+            for(int j=vSize-1; j>0; j--) {
+                t1 = fTimingVector->at(j); 
+                t2 = fTimingVector->at(j-1);
+                //tmp = TMath::Abs(t1-t2);
+                tmp = t1-t2;
+                std::cout << "\t\t\t j = " << j << " t1 = " << t1 << " t2 = " << t2 << " delta = t1 - t2 = " << tmp << std::endl;
+                if(delta < tmp) delta = tmp;
+            }
+            std::cout << "\n\n\n";
+        }
+
+        // FIGURE THIS OUT LATER
+        //auto p = sort_permutation(fTimingVector, 
+        //    [](double const& a, double const& b) { if(a>b) return a > b; });
+            
+    }
+
 }

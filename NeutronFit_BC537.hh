@@ -217,6 +217,45 @@ public:
         fEventTimeWindow = time;
     }
     
+    template <typename T>
+    std::vector<T> sort_from_ref(
+        std::vector<T> const& in,
+        std::vector<std::pair<size_t,std::vector<double>::const_iterator>> const& reference)
+    {
+        std::vector<T> ret(in.size());
+        size_t const size = in.size();
+        for(size_t i=0; i<size; i++) {
+            ret[i] = in[reference[i].first];
+        }
+        return ret;
+    }
+
+    // FIGURE THIS OUT LATER
+    //template <typename T, typename Compare> 
+    //std::vector<std::size_t> sort_permutation( 
+    //    const std::vector<T>& vec, 
+    //    Compare comp)
+    //{
+    //    std::vector<std::size_t> p(vec.size());
+    //    std::iota(p.begin(),p.end(),0);
+    //    std::sort(p.begin(),p.end(),
+    //        [&](std::size_t i, std::size_t j) { return comp(vec[i],vec[j]); });
+    //    return p;
+    //}
+    //template <typename T>
+    //std::vector<T> apply_permutation(
+    //    const std::vector<T>& vec,
+    //    const std::vector<std::size_t>& p)
+    //{
+    //    std::vector<T> sorted_vec(vec.size());
+    //    std::transform(p.begin(), p.end(), sorted_vec.begin(), 
+    //        [&](std::size_t i) { return vec[i]; });
+    //    return sorted_vec;
+    //}
+    //bool Compare(std::pair<double, double*> &a, std::pair<double, double*> &b) {
+    //    return a.first > b.first;
+    //}
+
 
     double fProtonCoeff[4];
     double fDeuteronCoeff[4];
