@@ -37,7 +37,6 @@ public:
     NeutronFit_BC537(int run_num=0);
     ~NeutronFit_BC537();
 
-    void BuildEventTree();
 
     void PrintParameters() {
         std::cout << "     a1 = " << fParameters[0] << std::endl;
@@ -155,6 +154,19 @@ public:
         //fExpHist->Draw("same");   
     }
 
+    // THIS FUNCTION DOESNT WORK!!
+    //void SetSimTree(bool sim = true) {
+    //    if(fSimTree) delete fSimTree;
+    //    fSimTree = NULL;
+    //    std::string name;
+    //    name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/";
+    //    if(sim) name += "g4out.root";
+    //    else name += "Sim" + std::to_string(fRunNum) + "EventTree.root";
+    //    fSimFile = TFile::Open(name.c_str());
+    //    if(sim) fSimTree = (TTree*)fSimFile->Get("ntuple/ntuple");
+    //    else fSimTree = (TTree*)fSimFile->Get("EventTree");
+    //}
+
     double GetEnergy() { return fEnergy; }
     int GetRunNum() { return fRunNum; }
 
@@ -166,7 +178,10 @@ public:
     TH1F * GetSimHist() { return fSimHist; }
     TH1F * GetExpHist() { return fExpHist; }
     
-    double GetSimEntries() { return fNumEntries; }
+    long GetSimEntries() { 
+        fNumEntries = fSimTree->GetEntries();
+        return fNumEntries; 
+    }
 
     double HistCompare(double * x, double * par);
     TF1 * Fit();
@@ -207,6 +222,8 @@ public:
     std::vector<int> * fPtypeVector;
     std::vector<double> * fTimingVector;
 
+    void BuildEventTree();
+    void BuildEventTree(double time);
     TTree * fEventTree;
     TTree * fLongEventTree;
     int fNumEvents;

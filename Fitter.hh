@@ -24,18 +24,18 @@
 
 class Fitter;
 
-struct MT_args
-{
-    MT_args(int run, Fitter * fit) {
-        sFit = fit;
-        sRun = run;
-    }   
-    int GetRun() { return sRun; }
-    Fitter * GetFit() { return sFit; }
-
-    int sRun;   
-    Fitter * sFit;
-};
+//struct MT_args
+//{
+//    MT_args(int run, Fitter * fit) {
+//        sFit = fit;
+//        sRun = run;
+//    }   
+//    int GetRun() { return sRun; }
+//    Fitter * GetFit() { return sFit; }
+//
+//    int sRun;   
+//    Fitter * sFit;
+//};
 
 class Fitter 
 {
