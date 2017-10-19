@@ -384,7 +384,7 @@ bool NeutronFit_BC537::DidParametersChange(double * par)
 
 void NeutronFit_BC537::BuildEventTree()
 {
-    std::cout << "\t Building event tree ... " << std::flush;
+    std::cout << "\t Building event tree ... " << std::endl << std::flush;
     
     if(fEventTree) { 
         delete fEventTree;
@@ -414,6 +414,7 @@ void NeutronFit_BC537::BuildEventTree()
 
     int vSize;
     for(int i=0; i<fNumEntries; i++) {
+        if(i%1000==0 || i==fNumEntries-1) std::cout << "\rBuilding events from entry " << i << " / " << fNumEntries-1 << " ..." << std::flush;
         GetEntry(i);
         vSize = (int)fTimingVector->size();
         //if(vSize == 1) continue;
@@ -433,7 +434,7 @@ void NeutronFit_BC537::BuildEventTree()
         *fEkinVector = sort_from_ref(*fEkinVector,order);
         *fPtypeVector = sort_from_ref(*fPtypeVector,order);
         *fTimingVector = sort_from_ref(*fTimingVector,order);
-  
+
         double t0 = fTimingVector->at(0); // time of the first interaction
         double t = 0;
         double delta = 0;
