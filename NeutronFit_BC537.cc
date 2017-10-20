@@ -382,13 +382,19 @@ bool NeutronFit_BC537::DidParametersChange(double * par)
 void NeutronFit_BC537::BuildEventTree()
 {
 
-    std::cout << "before fSimTree deleted";
+    if(fSimTree == fEventTree) {
+        fSimTree = NULL;
+        delete fEventTree;
+        fEventTree = NULL;
+    }
+
+    std::cout << "deleting fSimTree... " << std::flush;
     if(fSimTree) { delete fSimTree; fSimTree = NULL; }
-    std::cout << " ... finished!\n";
+    std::cout << "done!\n" << std::flush;
     std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
-    std::cout << "before fSimFile deleted";
+    std::cout << "deleting fSimFile... " << std::flush;
     if(fSimFile) { delete fSimFile; fSimFile = NULL; }
-    std::cout << " ... finished!\n";
+    std::cout << "done!\n" << std::flush;
     fSimFile = TFile::Open(name.c_str());
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
@@ -396,14 +402,18 @@ void NeutronFit_BC537::BuildEventTree()
     fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
     fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
     
+    std::cout << "deleting fEventTree... " << std::flush;
     if(fEventTree) { 
         delete fEventTree;
         fEventTree = NULL;
     }
+    std::cout << "done! \n" << std::flush;
+    std::cout << "deleting fLongEventTree... " << std::flush;
     if(fLongEventTree) { 
         delete fLongEventTree;
         fLongEventTree = NULL;
     }
+    std::cout << "done! \n" << std::flush;
     std::vector<double> ekin;
     std::vector<double> edep;
     std::vector<int> ptype;
@@ -424,8 +434,8 @@ void NeutronFit_BC537::BuildEventTree()
 
     int vSize;
     for(int i=0; i<GetSimEntries(); i++) {
-        if(i%5000==0 || i==fNumEntries-1) std::cout << "\r\t Building events from entry " << i << " / " << fNumEntries-1 
-                                                    << " ( " << Form("%.2f",double(i)/double(fNumEntries-1)*100.) << " % ) ..." << std::flush;
+        if(i%10000==0 || i==fNumEntries-1) std::cout << "\r\t Building events from entry " << i << " / " << fNumEntries-1 
+                                                    << " ( " << Form("%.1f",double(i)/double(fNumEntries-1)*100.) << " % ) ..." << std::flush;
         GetEntry(i);
         vSize = (int)fTimingVector->size();
         //if(vSize == 1) continue;
