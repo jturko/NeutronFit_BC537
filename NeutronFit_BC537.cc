@@ -388,32 +388,24 @@ void NeutronFit_BC537::BuildEventTree()
         fEventTree = NULL;
     }
 
-    std::cout << "deleting fSimTree... " << std::flush;
     if(fSimTree) { delete fSimTree; fSimTree = NULL; }
-    std::cout << "done!\n" << std::flush;
     std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
-    std::cout << "deleting fSimFile... " << std::flush;
     if(fSimFile) { delete fSimFile; fSimFile = NULL; }
-    std::cout << "done!\n" << std::flush;
     fSimFile = TFile::Open(name.c_str());
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
     fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
     fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
     fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
-    
-    std::cout << "deleting fEventTree... " << std::flush;
     if(fEventTree) { 
         delete fEventTree;
         fEventTree = NULL;
     }
-    std::cout << "done! \n" << std::flush;
-    std::cout << "deleting fLongEventTree... " << std::flush;
     if(fLongEventTree) { 
         delete fLongEventTree;
         fLongEventTree = NULL;
     }
-    std::cout << "done! \n" << std::flush;
+    
     std::vector<double> ekin;
     std::vector<double> edep;
     std::vector<int> ptype;
