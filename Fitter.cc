@@ -355,9 +355,9 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
     //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " bins" << std::endl;
     //std::cout << "the fMinExpCounts variable = " << fMinExpCounts << std::endl;
     if(hfit->GetExpCounts() < fMinExpCounts || fMinExpCounts < 0) {
-        std::cout << "old MinExpCounts = " << fMinExpCounts;
+        //std::cout << "old MinExpCounts = " << fMinExpCounts;
         fMinExpCounts = hfit->GetExpCounts();
-        std::cout << "\tnew MinExpCounts = " << fMinExpCounts << std::endl;
+        //std::cout << "\tnew MinExpCounts = " << fMinExpCounts << std::endl;
         for(int i=0; i<int(fScalingFactorVector.size()); i++) {
             fScalingFactorVector.at(i) = double(fNeutronFit_BC537Vector.at(i).GetExpCounts())/double(fMinExpCounts);
         }

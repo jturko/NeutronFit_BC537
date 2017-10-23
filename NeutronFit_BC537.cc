@@ -129,6 +129,8 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     else { 
         foundEventTree = true;
         fSimTree = (TTree*)(fSimFile->Get("EventTree"));
+        //fEventTree = fSimTree;
+        //fLongEventTree = (TTree*)(fSimFile->Get("LongEventTree"));
     }
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
     fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
@@ -426,7 +428,7 @@ void NeutronFit_BC537::BuildEventTree()
 
     int vSize;
     for(int i=0; i<GetSimEntries(); i++) {
-        if(i%10000==0 || i==fNumEntries-1) std::cout << "\r\t Building events from entry " << i << " / " << fNumEntries-1 
+        if(i%10000==0 || i==fNumEntries-1) std::cout << "\rRun " << fRunNum << " - building from evt " << i << " / " << fNumEntries-1 
                                                     << " ( " << Form("%.1f",double(i)/double(fNumEntries-1)*100.) << " % ) ..." << std::flush;
         GetEntry(i);
         vSize = (int)fTimingVector->size();
@@ -484,13 +486,13 @@ void NeutronFit_BC537::BuildEventTree()
     }
     //fEventTree->Write();   
     fNumEvents = fEventTree->GetEntries();
-    std::cout << " done!\n" << std::flush;
+    std::cout << " done! writing trees..." << std::flush;
 
     TFile * outfile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
     fEventTree->Write("EventTree");
     fLongEventTree->Write("LongEventTree");
-    outfile->Close();     
-    std::cout << "\t SimTree size: " << fSimTree->GetEntries() << " Events: " << fEventTree->GetEntries() << " Long Events: " << fLongEventTree->GetEntries() << std::endl;
+    outfile->Close();
+    std::cout << "done! sim evts: " << fSimTree->GetEntries() << " built evts: " << fEventTree->GetEntries() << " long evts: " << fLongEventTree->GetEntries() << std::endl;
     delete fSimTree;
     fSimTree = fEventTree;
     fNumEntries = fSimTree->GetEntries();
