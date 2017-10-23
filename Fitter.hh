@@ -433,6 +433,13 @@ public:
         return fRunMT;
     } 
 
+    void BuildEventTrees(double time = 200.) {
+        std::cout << "Building event trees w/ time window = " << time << " ns" << std::endl;
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
+            fNeutronFit_BC537Vector.at(i).BuildEventTree(time);
+        }
+    }
+
 };
 
 #endif
