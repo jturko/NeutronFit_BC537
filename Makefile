@@ -16,6 +16,9 @@ fitNM: fitNM.cc libFitter.so
 draw: draw.cc libFitter.so
 	$(CXX) $(CXXFLAGS) -o draw $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
 
+Sort: Sort.cc libFitter.so
+	$(CXX) $(CXXFLAGS) -o Sort $(FITTERLIB) $(ROOTLIBS) $(ROOTCONFIG) $^
+
 libFitter.so: FitterDict.cxx $(SOURCES)
 	g++ -shared -o $@ $(ROOTCONFIG) $(CXXFLAGS) $(ROOTLIBS) -I$(ROOTSYS)/include $^
 
