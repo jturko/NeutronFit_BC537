@@ -348,9 +348,15 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
     NeutronFit_BC537 * hfit = new NeutronFit_BC537(i);
     SetNextNeutronFit_BC537(*hfit);
     
-    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
-    fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
-    //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
+    #ifdef __linux__
+        //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (void (*) (void *))&Fitter::SortRunMT, (void*)this));
+        fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidRtnFunc_t)&Fitter::SortRunMT, (void*)this));
+        //fThreadVector.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
+    //#elif __APPLE__ || __MACH__
+    //    std::cout << "NO MULTITHREADING AVAILABLE W/ MAC OSX" << std::endl;
+    #endif    
+
+    
     
     //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " bins" << std::endl;
     //std::cout << "the fMinExpCounts variable = " << fMinExpCounts << std::endl;
