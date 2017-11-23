@@ -129,16 +129,17 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     else { 
         foundEventTree = true;
         fSimTree = (TTree*)(fSimFile->Get("EventTree"));
-        fEventTree = (TTree*)(fSimFile->Get("EventTree"));
-        fLongEventTree = (TTree*)(fSimFile->Get("LongEventTree"));
+        //fEventTree = (TTree*)(fSimFile->Get("EventTree"));
+        //fLongEventTree = (TTree*)(fSimFile->Get("LongEventTree"));
     }
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
     fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
     fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
     fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
     fNumEntries = fSimTree->GetEntries();
-    if(!foundEventTree) BuildEventTree();
-    
+    if(!foundEventTree) {
+        //BuildEventTree();
+    }
 
     fProtonCoeff[0] = 0.74; fProtonCoeff[1] = 3.2; fProtonCoeff[2] = 0.20; fProtonCoeff[3] = 0.97;
     fDeuteronCoeff[0] = 0.75; fDeuteronCoeff[1] = 2.80; fDeuteronCoeff[2] = 0.25; fDeuteronCoeff[3] = 0.93;
@@ -383,36 +384,30 @@ bool NeutronFit_BC537::DidParametersChange(double * par)
 
 void NeutronFit_BC537::BuildEventTree()
 {
-
-    //if(fSimTree == fEventTree) {
-    //    fSimTree = NULL;
+    //if(fSimTree) { 
+    //    std::cout << "deleting fSimTree ... ";
+    //    delete fSimTree; 
+    //    fSimTree = NULL; 
+    //    std::cout << "done!\n" << std::flush;
+    //}
+    //if(fEventTree) { 
+    //    std::cout << "deleting fEventTree ... ";
     //    delete fEventTree;
     //    fEventTree = NULL;
+    //    std::cout << "done!\n" << std::flush;
     //}
-    if(fSimTree) { 
-        std::cout << "deleting fSimTree ... ";
-        delete fSimTree; 
-        fSimTree = NULL; 
-        std::cout << "done!\n" << std::flush;
-    }
-    if(fEventTree) { 
-        std::cout << "deleting fEventTree ... ";
-        delete fEventTree;
-        fEventTree = NULL;
-        std::cout << "done!\n" << std::flush;
-    }
-    if(fLongEventTree) { 
-        std::cout << "deleting fLongEventTree ... ";
-        delete fLongEventTree;
-        fLongEventTree = NULL;
-        std::cout << "done!\n" << std::flush;
-    }
-    if(fSimFile) { 
-        std::cout << "deleting fSimFile ... ";
-        delete fSimFile; 
-        fSimFile = NULL; 
-        std::cout << "done!\n" << std::flush;
-    }
+    //if(fLongEventTree) { 
+    //    std::cout << "deleting fLongEventTree ... ";
+    //    delete fLongEventTree;
+    //    fLongEventTree = NULL;
+    //    std::cout << "done!\n" << std::flush;
+    //}
+    //if(fSimFile) { 
+    //    std::cout << "deleting fSimFile ... ";
+    //    delete fSimFile; 
+    //    fSimFile = NULL; 
+    //    std::cout << "done!\n" << std::flush;
+    //}
     std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
@@ -426,18 +421,23 @@ void NeutronFit_BC537::BuildEventTree()
     std::vector<int> ptype;
     std::vector<double> time;
     
-    fEventTree = new TTree();
+    TFile * outfile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
+    outfile->cd();
+    
+    fEventTree = new TTree("EventTree","EventTree");
     fEventTree->Branch("eKinVector",&ekin);
     fEventTree->Branch("eDepVector",&edep);
     fEventTree->Branch("particleTypeVector",&ptype);
     fEventTree->Branch("timingVector",&time);
     fNumEvents = 0;
+    //fEventTree->SetDirectory(outfile);
     
-    fLongEventTree = new TTree();
+    fLongEventTree = new TTree("LongEventTree","LongEventTree");
     fLongEventTree->Branch("eKinVector",&ekin);
     fLongEventTree->Branch("eDepVector",&edep);
     fLongEventTree->Branch("particleTypeVector",&ptype);
     fLongEventTree->Branch("timingVector",&time);
+    //fLongEventTree->SetDirectory(outfile);
 
     int vSize;
     for(int i=0; i<GetSimEntries(); i++) {
@@ -495,32 +495,36 @@ void NeutronFit_BC537::BuildEventTree()
         }
         fEventTree->Fill();
         if(longEvent) fLongEventTree->Fill();
+        
+        //fEventTree->FlushBaskets();
+        //fLongEventTree->FlushBaskets();
     }
-    //fEventTree->Write();   
     fNumEvents = fEventTree->GetEntries();
     std::cout << " done! writing trees ..." << std::flush;
 
-    TFile * outfile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
-    outfile->cd();
-    fEventTree->Write("EventTree");
-    fLongEventTree->Write("LongEventTree");
-    outfile->Close();
+    fEventTree->Write("EventTree2");
+    fLongEventTree->Write("LongEventTree2");
+    
     std::cout << " done! sim evts: " << fSimTree->GetEntries() << " built evts: " << fEventTree->GetEntries() << " long evts: " << fLongEventTree->GetEntries() << std::endl;
+    
     if(fSimTree) delete fSimTree; fSimTree = NULL;
     if(fSimFile) delete fSimFile; fSimFile = NULL;
     if(fEventTree) delete fEventTree; fEventTree = NULL;
     if(fLongEventTree) delete fLongEventTree; fLongEventTree = NULL;
-    fSimFile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum));
-    fSimFile->cd();
-    fSimTree = (TTree*)fSimFile->Get("EventTree");
-    fEventTree = (TTree*)fSimFile->Get("EventTree");
-    fLongEventTree = (TTree*)fSimFile->Get("LongEventTree");
-    fNumEntries = fSimTree->GetEntries();
-    fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
-    fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
-    fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
-    fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
-
+    
+    //fSimFile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum));
+    //fSimFile->cd();
+    //fSimTree = (TTree*)fSimFile->Get("EventTree");
+    //fEventTree = (TTree*)fSimFile->Get("EventTree");
+    //fLongEventTree = (TTree*)fSimFile->Get("LongEventTree");
+    //fNumEntries = fSimTree->GetEntries();
+    //fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
+    //fSimTree->SetBranchAddress("eKinVector",&fEkinVector,&fEkinBranch);
+    //fSimTree->SetBranchAddress("particleTypeVector",&fPtypeVector,&fPtypeBranch);
+    //fSimTree->SetBranchAddress("timingVector",&fTimingVector,&fTimingBranch);
+    
+    outfile->Write();
+    outfile->Close();
 }
 
 void NeutronFit_BC537::BuildEventTree(double time)
