@@ -97,7 +97,7 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
     //fExpFile = TFile::Open("~/data/hists2012_resort.root"); 
-    fExpFile = TFile::Open("~/data/BC537_bkgsub.root"); 
+    fExpFile = TFile::Open("/tulkas/geant4/joey/smearing/deuteron/BC537_bkgsub.root"); 
 
     std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
@@ -119,10 +119,10 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
     }    
 
     bool foundEventTree = false;
-    std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/Sim" + std::to_string(fRunNum) + "EventTree.root";
+    std::string name = "/tulkas/geant4/joey/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/Sim" + std::to_string(fRunNum) + "EventTree.root";
     fSimFile = TFile::Open(name.c_str());
     if(!fSimFile) {
-        name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
+        name = "/tulkas/geant4/joey/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
         fSimFile = TFile::Open(name.c_str());
         fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
     }
@@ -413,7 +413,7 @@ void NeutronFit_BC537::BuildEventTree()
         fSimFile = NULL; 
         std::cout << "done!\n" << std::flush;
     }
-    std::string name = "~/data/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
+    std::string name = "/tulkas/geant4/joey/smearing/deuteron/G4_RAW_Timing/Sim" + std::to_string(fRunNum) + "/g4out.root";
     fSimFile = TFile::Open(name.c_str());
     fSimTree = (TTree*)(fSimFile->Get("ntuple/ntuple")); 
     fSimTree->SetBranchAddress("eDepVector",&fEdepVector,&fEdepBranch);
@@ -500,7 +500,7 @@ void NeutronFit_BC537::BuildEventTree()
     fNumEvents = fEventTree->GetEntries();
     std::cout << " done! writing trees ..." << std::flush;
 
-    TFile * outfile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
+    TFile * outfile = TFile::Open(Form("/tulkas/geant4/joey/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum),"RECREATE"); 
     outfile->cd();
     fEventTree->Write("EventTree");
     fLongEventTree->Write("LongEventTree");
@@ -510,7 +510,7 @@ void NeutronFit_BC537::BuildEventTree()
     if(fSimFile) delete fSimFile; fSimFile = NULL;
     if(fEventTree) delete fEventTree; fEventTree = NULL;
     if(fLongEventTree) delete fLongEventTree; fLongEventTree = NULL;
-    fSimFile = TFile::Open(Form("~/data/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum));
+    fSimFile = TFile::Open(Form("/tulkas/geant4/joey/smearing/deuteron/G4_RAW_Timing/Sim%d/Sim%dEventTree.root",fRunNum,fRunNum));
     fSimFile->cd();
     fSimTree = (TTree*)fSimFile->Get("EventTree");
     fEventTree = (TTree*)fSimFile->Get("EventTree");
