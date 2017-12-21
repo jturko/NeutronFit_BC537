@@ -425,6 +425,12 @@ public:
     std::vector<TThread*> fThreadVector;
     bool fRunMT;
     void SetMT(bool val = true) {
+        #if defined(__APPLE__) || defined(__MACH__)
+            std::cout << "CANNOT SET MULTITHREADED, RUNNING ON MAC OSX" << std::endl;
+            fRunMT = false;
+            return;
+        #endif
+
         if(val == true) std::cout << "\n\t--->\tRUNNING MULTITHREADED" << std::endl;
         else            std::cout << "\n\t--->\tNOT RUNNING MULTITHREADED" << std::endl;; 
         fRunMT = val;
