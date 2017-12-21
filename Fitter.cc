@@ -103,7 +103,11 @@ void Fitter::Draw()
     }
 }
 
-Fitter::Fitter() { InitializeParameters(); } 
+Fitter::Fitter() 
+{ 
+    fMinExpCounts = -1;
+    InitializeParameters(); 
+}
 
 Fitter::~Fitter() 
 {
@@ -111,6 +115,8 @@ Fitter::~Fitter()
     //    fThreadVector.at(i)->Delete();
     //    delete fThreadVector.at(i);
     //}
+    fCanvas = NULL;
+    InitializeParameters();
 }
 
 Fitter::Fitter(int one)
@@ -299,48 +305,14 @@ void Fitter::WriteToFile(std::string name)
 
 void Fitter::SortAllRunsMT() 
 {
-    //std::vector<TThread*> thvec;
-    //for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-    //    thvec.push_back(new TThread(Form("Thread_%d",i), (TThread::VoidFunc_t)&Fitter::SortRunMT, (void*)this));
-    //    thvec.at(i)->Run();
-    //}
-    
-    //std::vector<TThread*> tList;
-    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-        fThreadVector.at(i)->Run();
-        //tList.push_back(fThreadVector.at(i));
-    }
-    
-    //while(int(tList.size())>0) {
-    //    std::cout << "completed " << (GetNumberOfNeutronFit_BC537s()-int(tList.size())) << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
-    //    for(int i=0; i<int(tList.size()); i++) {
-    //        if(tList.at(i)->GetState() == TThread::kCanceledState) {
-    //            tList.erase(std::remove(tList.begin(),tList.end(),tList.at(i)),tList.end());
-    //            std::cout << "completed " << (GetNumberOfNeutronFit_BC537s()-int(tList.size())) << "/" << GetNumberOfNeutronFit_BC537s() << "\r" << std::flush;
-    //        }
-    //    }
-    //    TThread::Sleep(0,1e6);
-    //}    
-    //std::cout << std::flush << std::endl;
+    #ifdef __linux__
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fThreadVector.at(i)->Run();
+        for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) fThreadVector.at(i)->Join();
+    #else
+        std::cout << "NOT LINUX! -> cannot run MT, instead calling SortAllRuns()" << std::endl;
+        SortAllRuns(true);
+    #endif    
 
-    for(int i=0; i<GetNumberOfNeutronFit_BC537s(); i++) {
-        //std::cout << "trying to join thread " << i << std::endl;
-        fThreadVector.at(i)->Join();
-        //std::cout << "done! " << i << std::endl;
-    }
-    //while(fThreadVector.at(0)->Exists() > 1) {
-    //    //std::cout << "threads running = " << fThreadVector.at(0)->Exists() << " ... sleeping..." << std::endl;
-    //    TThread::Ps();
-    //    std::cout << std::endl;
-    //    TThread::Sleep(1,0);
-    //}
-    
-    //TThread::CleanUp();
-
-    //TThread::Ps();
-    //TThread::Sleep(10,0);
-    //TThread::Ps();
-    
     DoChi2();
 }
 
@@ -358,7 +330,7 @@ void Fitter::SetNextNeutronFit_BC537(int i) {
 
     
     
-    //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " bins" << std::endl;
+    //std::cout << "just created new NeutronFit with " << hfit->GetExpCounts() << " counts" << std::endl;
     //std::cout << "the fMinExpCounts variable = " << fMinExpCounts << std::endl;
     if(hfit->GetExpCounts() < fMinExpCounts || fMinExpCounts < 0) {
         //std::cout << "old MinExpCounts = " << fMinExpCounts;
