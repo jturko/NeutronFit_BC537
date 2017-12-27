@@ -8,9 +8,9 @@ int main()
     //Fitter fit(50,37,20,15,18,58,56,52);    
     //Fitter fit(51, 46, 38, 2, 25, 4, 18, 58, 55 ,52);
     Fitter fit(50, 46, 38, 2, 25, 4, 18, 58, 55 ,52);
-    fit.SetNextNeutronFit_BC537(49);
-    fit.SetNextNeutronFit_BC537(48);
-    fit.SetNextNeutronFit_BC537(47);
+    //fit.SetNextNeutronFit_BC537(49);
+    //fit.SetNextNeutronFit_BC537(48);
+    //fit.SetNextNeutronFit_BC537(47);
    
     fit.SetMT(true);
    
@@ -56,12 +56,12 @@ int main()
     fit.SetSimAnLowOffset(0);
     fit.SetSimAnStepOffset(0.25);
 
-    fit.SetInLoopMax(50);
+    fit.SetInLoopMax(1);
     fit.SetStartChi2(10);    
 
     //fit.SetSmearingCoeff(0.130631,0.135853,1.20556e-6);
 
-    double T_i = 10;
+    double T_i = 2;
     double T_f = 0.01;
     double alpha = 0.998;
 
@@ -72,11 +72,9 @@ int main()
     //T_i = 0.1;    
     //fit.MyMinimizeSimAn9(alpha,T_i,T_f);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fit.SetSimAnStart( 4.39550e-01 , 5.79582e-01 , 6.61679e-01 , 1.16190e+00 , 0, 0.284 , 0.064 , 0.00002 , 0); // values from fitting the 50%  edge PH
+    //fit.SetSimAnStart( 4.39550e-01 , 5.79582e-01 , 6.61679e-01 , 1.16190e+00 , 0, 0.284 , 0.064 , 0.00002 , 0); // values from fitting the 50%  edge PH
+    fit.SetSimAnStart( 0.443851 , 0.475521 , 0.890730 , 1.29212 , 0 , 0.25 , 0.08 , 0 , 0 );
     fit.SetOffset(0);
-    fit.SetInLoopMax(1);
-    alpha = 0.999;
-    T_i = 0.1;    
     fit.MyMinimizeSimAn(alpha,T_i,T_f);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
