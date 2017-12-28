@@ -782,7 +782,11 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
     for(int i=0; i<nPar; i++) best_soln[i] = old_soln[i];
     
     while(T > T_min) {
-        for(int inloop = 0; inloop<fInloopmax; inloop++) {        
+        int subiter = 0;
+        int subiter_counter = 0;
+        //for(int inloop = 0; inloop<fInloopmax; inloop++) {        
+        while(subiter < fInloopmax) {
+            subiter_counter++;
             SimAnStep(old_soln,new_soln);
             new_chi2 = FitValue((const double *)new_soln);
             if(new_chi2 < best_chi2) {
@@ -800,18 +804,28 @@ int Fitter::MyMinimizeSimAn(double alpha, double T_0, double T_min)
             else chance = TMath::Exp(-delta/T);
             double rando = fRandom.Rndm();
             
-            if(inloop==0) std::cout << "Iter " << iter << "/" << (int(itermax)+1) << "\t T = " << T << "\t old = " << old_chi2 << "\t new = " << new_chi2 << "\t chance = " << chance << std::endl;
-            
+            //if(inloop==0) std::cout << "Iter " << iter << "/" << (int(itermax)+1) << "\t T = " << T << "\t old = " << old_chi2 << "\t new = " << new_chi2 << "\t chance = " << chance << std::endl;
+
             if(chance>rando) {     // deciding whether to take the new point or not ( if new chi2 is better than old, chance=1 and we take the new point for sure)
                 for(int i=0; i<nPar; i++) old_soln[i] = new_soln[i];
                 old_chi2 = new_chi2;
+                subiter++;
             }       
+            std::cout << std::setprecision(3);
+            std::cout << "Iter " << iter << "/" << (int(itermax)+1) << " T = " << T << " ";
+            std::cout << "Accepted " << subiter << "/" << fInloopmax << " of " << subiter_counter << " trials" << std::flush;
+            std::cout << "; @ X^2 = " << old_chi2 << " (";
+            for(int i=0; i<nPar; i++) std::cout << old_soln[i] << ", "; 
+            std::cout << "\b\b)\r" << std::flush;
+            std::cout << std::setprecision(5);
         }
+
         //for(int i=0; i<nPar; i++) std::cout << "x(" << iter << ")_" << i << " = " << new_soln[i] << "  ";
         //std::cout << std::endl;
     
         T *= alpha;
         iter++;
+        std::cout << std::endl;
     }
 
     //std::cout << "best chi2 = " << best_chi2 << " w/ parameters ";
