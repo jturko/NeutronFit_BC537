@@ -11,7 +11,7 @@ int main()
     //for(int i=0; i<51; i++) fit.SetNextNeutronFit_BC537(i);
     //for(int i=52; i<64; i++) fit.SetNextNeutronFit_BC537(i);
 
-    fit.SetSimSortMax(-1);    
+    //fit.SetSimSortMax(-1);    
     fit.SetChi2Method(2);
     
     //fit.Print();
@@ -41,19 +41,32 @@ int main()
 
     // fit parameters from plotEdgeFit script output + fit
     //fit.SetParameters(4.39550e-01 , 5.79582e-01 , 6.61679e-01 , 1.16190e+00 , 0 , 0 , 0 , 0);
-    fit.SetParameters(4.39550e-01 , 5.79582e-01 , 6.61679e-01 , 1.16190e+00 , 0, 0.284 , 0.064 , 0.00002);
-    fit.SetOffset(0);
-
+    //fit.SetParameters(4.39550e-01 , 5.79582e-01 , 6.61679e-01 , 1.16190e+00 , 0, 0.284 , 0.064 , 0.00002);
+    //fit.SetOffset(0);
 
     // massive negative overall chi2 results from fit_nessa3_try3...out
     //fit.SetParameters(0.55917 , 1.64428 , 0.29104 , 1.00054 , 0.00006 , 0.24106 , 0.12978 , 0.00912);
     //fit.SetOffset( 6.16387 );
+
+    // from tulkas: /tulkas/geant4/joey/smearing/deuteron/NeutronFit_BC537/fit_nohup_out/fit_edgefit.out
+    //fit.SetParameters(0.42209,0.52858,0.77273,1.08215,0,0.30943,0.21620,0.00358);
+    //fit.SetOffset(0);
+
+    // from tulkas: /tulkas/geant4/joey/smearing/deuteron/NeutronFit_BC537/fit.out
+    //fit.SetParameters(0.431, 0.467, 0.894, 1.208, 0.00, 0.311, 0.114, 0.006);
+    //fit.SetOffset(0);
+    
+    // published parameters in thesis
+    //fit.SetParameters(0.418,0.470,0.849,1.168,0.017,0,0,0);
+    fit.SetParameters(0.418,0.470,0.849,1.168,0,0.180,0.126,0.010);
+    fit.SetOffset(0);
 
     fit.SortAllRunsMT();
     
     fit.PrintChi2();
 
     fit.DrawToFile("draw.pdf");
+    fit.WriteToFile("draw.root");
 
     return 0;
 

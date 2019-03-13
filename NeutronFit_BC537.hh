@@ -148,9 +148,9 @@ public:
         double ymax = 1.25*fExpHist->GetBinContent(fExpHist->GetMaximumBin());
         fExpHist->GetYaxis()->SetRangeUser(0.1,ymax);
 
-        fExpHist->Draw();
+        fExpHist->Draw("h");
         //fFitFunc->Draw("same");
-        fSimHist->Draw("same");   
+        fSimHist->Draw("h same");   
         //fExpHist->Draw("same");   
     }
 

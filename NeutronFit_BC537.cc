@@ -40,15 +40,15 @@ NeutronFit_BC537::NeutronFit_BC537(int run_num) :
         40,40,50,50,100,100,80,80,70,70,70,70,70,80,80,80,100,100,100,125,70,70,60,35,35,35,30,30,30,30,30,40,40,40,40,20,20,20,20,20,25,25,25,20,20,17,17,17,17,16,15,8,300,100,100,100,100,100,100,100,100,100,100,100
     };
     fCutoffLow = cutoff_low_vector[fRunNum];
-    
+
     double cutoff_high_vector[] =
     {
         110,135,190,240,840,800,750,640,560,470,390,320,560,660,800,940,1050,1200,1300,1350,450,370,310,320,390,460,145,180,220,260,310,360,410,450,480,110,100,85,75,65,125,120,110,90,70,55,42,33,32,28,27,21,3200,3100,2800,2500,2200,1900,1600,1300,1050,850,700,600
     };
     fCutoffHigh = cutoff_high_vector[fRunNum];
  
-    //fExpFile = TFile::Open("/tulkas/geant4/joey/smearing/deuteron/BC537_bkgsub.root"); 
-    fExpFile = TFile::Open("/tulkas/geant4/joey/smearing/deuteron/BC537_bkgsub_mycal.root"); 
+    fExpFile = TFile::Open("/tulkas/geant4/joey/smearing/deuteron/BC537_bkgsub.root"); 
+    //fExpFile = TFile::Open("/tulkas/geant4/joey/smearing/deuteron/BC537_bkgsub_mycal.root"); 
 
     std::string hist_name = "ScionixCal" + std::to_string(fRunNum);
     std::string title = std::to_string(fEnergy) + " MeV";
@@ -187,7 +187,7 @@ void NeutronFit_BC537::Sort(double * par)
     TThread::Lock();
     if(fSimHist) { delete fSimHist; fSimHist = NULL; }
     //fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,-10,5000); 
-    fSimHist = new TH1F("fSimHist","fSimHist",fExpBinNum,fExpBinLow,fExpBinHigh); 
+    fSimHist = new TH1F("fSimHist",Form("fSimHist - %.2f MeV",fEnergy),fExpBinNum,fExpBinLow,fExpBinHigh); 
     TThread::UnLock();
 
     int nHits = 0;
@@ -280,7 +280,7 @@ void NeutronFit_BC537::Sort(double * par)
 
     fExpHist->SetBinContent(fExpBinNum+1,0);
 
-    ApplyCutoffLow(fCutoffLow,"sim");    
+    //ApplyCutoffLow(fCutoffLow,"sim");    
     fSimHist->Scale(fExpHist->Integral(fExpHist->FindBin(fCutoffLow),fExpHist->FindBin(fCutoffHigh),"width")/fSimHist->Integral(fSimHist->FindBin(fCutoffLow),fSimHist->FindBin(fCutoffHigh),"width"));
     fSimHist->SetStats(false);
     //std::cout << "sorting " << fEnergy << " MeV... done!                                                   " << std::endl;
