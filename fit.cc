@@ -6,8 +6,8 @@
 int main()
 {
     //Fitter fit(50,37,20,15,18,58,56,52);    
-    //Fitter fit(51, 46, 38, 2, 25, 4, 18, 58, 55 ,52);
-    Fitter fit(50,49,48,47);   
+    Fitter fit(51, 46, 38, 2, 25, 4, 18, 58, 55 ,52);
+    //Fitter fit(50,49,48,47);   
 
     fit.SetMT(true);
    
